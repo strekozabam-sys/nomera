@@ -72,6 +72,40 @@ CREATE TABLE IF NOT EXISTS grants (
 );
 CREATE INDEX IF NOT EXISTS grants_user_idx ON grants(user_id, applied);
 `);
+db.exec(`
+CREATE TABLE IF NOT EXISTS daily_tasks (
+ id INTEGER PRIMARY KEY AUTOINCREMENT,
+ title TEXT NOT NULL,
+ kind TEXT NOT NULL,
+ target INTEGER NOT NULL CHECK(target>0),
+ min_rarity INTEGER NOT NULL DEFAULT 0,
+ country TEXT NOT NULL DEFAULT '',
+ reward_rub INTEGER NOT NULL DEFAULT 0,
+ reward_usd INTEGER NOT NULL DEFAULT 0,
+ active INTEGER NOT NULL DEFAULT 1,
+ created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS task_progress (
+ user_id INTEGER NOT NULL REFERENCES users(id),
+ task_id INTEGER NOT NULL REFERENCES daily_tasks(id) ON DELETE CASCADE,
+ day TEXT NOT NULL,
+ progress INTEGER NOT NULL DEFAULT 0,
+ claimed INTEGER NOT NULL DEFAULT 0,
+ PRIMARY KEY(user_id,task_id,day)
+);
+`);
+// Игровой день заданий — по Москве (UTC+3)
+const taskDay=(shiftDays=0)=>new Date(Date.now()+3*3600e3-shiftDays*864e5).toISOString().slice(0,10);
+function trackTasks(userId,{rarity,country}){
+ const tasks=db.prepare('SELECT id,kind,target,min_rarity,country FROM daily_tasks WHERE active=1').all();
+ if(!tasks.length) return;
+ const day=taskDay();
+ const up=db.prepare('INSERT INTO task_progress(user_id,task_id,day,progress) VALUES(?,?,?,1) ON CONFLICT(user_id,task_id,day) DO UPDATE SET progress=MIN(?,progress+1) WHERE claimed=0');
+ for(const t of tasks){
+  const hit=t.kind==='rolls'||(t.kind==='rarity'&&rarity>=t.min_rarity)||(t.kind==='country'&&country===t.country);
+  if(hit) up.run(userId,t.id,day,t.target);
+ }
+}
 app.use((req,res,next)=>{res.setHeader('Access-Control-Allow-Origin','*');res.setHeader('Access-Control-Allow-Headers','Content-Type, Authorization');res.setHeader('Access-Control-Allow-Methods','GET, POST, OPTIONS');if(req.method==='OPTIONS')return res.sendStatus(204);next()});
 app.use(express.json({limit:'32kb'}));
 app.use(express.static(__dirname));
@@ -152,10 +186,11 @@ app.post('/api/admin/grant',auth,adminOnly,(req,res)=>{
   addGrant({rubles,dollars}); return res.json({ok:true});
  }
  if(kind==='plate'){
-  const p=req.body.plate||{}; const text=String(p.text||'').trim().toUpperCase(), country=String(p.country||'ru');
+  const p=req.body.plate||{}; const text=String(p.text||'').trim().toUpperCase(), country=String(p.country||'ru').trim().toLowerCase();
   if(!text||text.length>40) return fail(res,400,'Некорректный номер');
+  if(!/^[a-z0-9_]{2,8}$/.test(country)) return fail(res,400,'Некорректный код страны (2–8 латинских букв или цифр)');
   const id=crypto.randomUUID();
-  const fields={id,country,text,region:String(p.region||''),letters:String(p.letters||''),digits:String(p.digits||''),type:String(p.type||'civ'),rarity:Math.max(0,Math.min(4,Number(p.rarity)||0)),value:Math.max(0,Math.min(2000000000,Math.round(Number(p.value)||0)))};
+  const fields={id,country,countryName:String(p.countryName||'').trim().slice(0,40),text,region:String(p.region||''),letters:String(p.letters||''),digits:String(p.digits||''),type:String(p.type||'civ'),rarity:Math.max(0,Math.min(4,Number(p.rarity)||0)),value:Math.max(0,Math.min(2000000000,Math.round(Number(p.value)||0)))};
   try{
    db.prepare('INSERT INTO plates(id,owner_id,country,plate_text,region,letters,digits,plate_type,rarity,value,details_json) VALUES(?,?,?,?,?,?,?,?,?,?,?)')
     .run(id,target.id,country,text,fields.region,fields.letters,fields.digits,fields.type,fields.rarity,fields.value,JSON.stringify(Array.isArray(p.details)?p.details.slice(0,20):[]));
@@ -164,6 +199,66 @@ app.post('/api/admin/grant',auth,adminOnly,(req,res)=>{
  }
  return fail(res,400,'Неизвестный тип выдачи');
 });
+// ---------- Ежедневные задания ----------
+const TASK_KINDS=['rolls','rarity','country'];
+app.get('/api/admin/tasks',auth,adminOnly,(req,res)=>{
+ const day=taskDay();
+ const tasks=db.prepare(`SELECT t.*,
+  (SELECT COUNT(*) FROM task_progress p WHERE p.task_id=t.id AND p.day=? AND p.progress>=t.target) AS done_today,
+  (SELECT COUNT(*) FROM task_progress p WHERE p.task_id=t.id AND p.day=? AND p.claimed=1) AS claimed_today
+  FROM daily_tasks t ORDER BY t.id DESC`).all(day,day).map(t=>({...t,active:!!t.active}));
+ res.json({tasks});
+});
+app.post('/api/admin/tasks',auth,adminOnly,(req,res)=>{
+ const b=req.body||{};
+ const kind=String(b.kind||''), title=String(b.title||'').trim().slice(0,100);
+ const target=Number(b.target), minRarity=Number(b.minRarity||0), rewardRub=Number(b.rewardRub||0), rewardUsd=Number(b.rewardUsd||0);
+ const country=String(b.country||'').trim().toLowerCase();
+ if(!TASK_KINDS.includes(kind)) return fail(res,400,'Неизвестный тип задания');
+ if(!title) return fail(res,400,'Нужно название задания');
+ if(!Number.isSafeInteger(target)||target<1||target>1000000) return fail(res,400,'Цель: целое число от 1 до 1 000 000');
+ if(!Number.isSafeInteger(minRarity)||minRarity<0||minRarity>4) return fail(res,400,'Редкость: от 0 до 4');
+ if(!Number.isSafeInteger(rewardRub)||rewardRub<0||rewardRub>2e9||!Number.isSafeInteger(rewardUsd)||rewardUsd<0||rewardUsd>1e9) return fail(res,400,'Награда должна быть целым неотрицательным числом');
+ if(!rewardRub&&!rewardUsd) return fail(res,400,'Укажи награду в ₽ или в $');
+ if(kind==='country'&&!/^[a-z0-9_]{2,8}$/.test(country)) return fail(res,400,'Выбери страну');
+ const info=db.prepare('INSERT INTO daily_tasks(title,kind,target,min_rarity,country,reward_rub,reward_usd) VALUES(?,?,?,?,?,?,?)')
+  .run(title,kind,target,kind==='rarity'?minRarity:0,kind==='country'?country:'',rewardRub,rewardUsd);
+ res.json({ok:true,id:info.lastInsertRowid});
+});
+app.post('/api/admin/tasks/:id/toggle',auth,adminOnly,(req,res)=>{
+ const r=db.prepare('UPDATE daily_tasks SET active=1-active WHERE id=?').run(Number(req.params.id));
+ if(!r.changes) return fail(res,404,'Задание не найдено'); res.json({ok:true});
+});
+app.post('/api/admin/tasks/:id/delete',auth,adminOnly,(req,res)=>{
+ const r=db.prepare('DELETE FROM daily_tasks WHERE id=?').run(Number(req.params.id));
+ if(!r.changes) return fail(res,404,'Задание не найдено'); res.json({ok:true});
+});
+app.get('/api/tasks',auth,(req,res)=>{
+ const day=taskDay();
+ db.prepare('DELETE FROM task_progress WHERE day<?').run(taskDay(7));
+ const tasks=db.prepare(`SELECT t.id,t.title,t.kind,t.target,t.min_rarity,t.country,t.reward_rub,t.reward_usd,
+  COALESCE(p.progress,0) AS progress, COALESCE(p.claimed,0) AS claimed
+  FROM daily_tasks t LEFT JOIN task_progress p ON p.task_id=t.id AND p.user_id=? AND p.day=?
+  WHERE t.active=1 ORDER BY t.id`).all(req.user.id,day).map(t=>({...t,progress:Math.min(t.progress,t.target),claimed:!!t.claimed}));
+ res.json({day,tasks});
+});
+app.post('/api/tasks/:id/claim',auth,(req,res)=>{
+ try{
+  const out=db.transaction(()=>{
+   const t=db.prepare('SELECT * FROM daily_tasks WHERE id=? AND active=1').get(Number(req.params.id));
+   if(!t) throw Error('Задание недоступно');
+   const day=taskDay();
+   const p=db.prepare('SELECT progress,claimed FROM task_progress WHERE user_id=? AND task_id=? AND day=?').get(req.user.id,t.id,day);
+   if(!p||p.progress<t.target) throw Error('Задание ещё не выполнено');
+   if(p.claimed) throw Error('Награда уже получена');
+   db.prepare('UPDATE task_progress SET claimed=1 WHERE user_id=? AND task_id=? AND day=?').run(req.user.id,t.id,day);
+   db.prepare('UPDATE users SET rubles=rubles+?, dollars=dollars+? WHERE id=?').run(t.reward_rub,t.reward_usd,req.user.id);
+   return {rubles:t.reward_rub,dollars:t.reward_usd};
+  })();
+  res.json({ok:true,...out});
+ }catch(e){ return fail(res,400,e.message||'Не удалось забрать награду'); }
+});
+
 app.get('/api/grants',auth,(req,res)=>{
  const grants=db.prepare('SELECT id,kind,payload_json FROM grants WHERE user_id=? AND applied=0 ORDER BY id').all(req.user.id).map(g=>({id:g.id,kind:g.kind,payload:JSON.parse(g.payload_json)}));
  res.json({grants});
@@ -196,6 +291,7 @@ app.post('/api/claim',auth,(req,res)=>{
   db.prepare(`INSERT INTO plates(id,owner_id,country,plate_text,region,letters,digits,plate_type,rarity,value,details_json) VALUES(?,?,?,?,?,?,?,?,?,?,?)`)
    .run(id,req.user.id,country,text,String(p.region||''),String(p.letters||''),String(p.digits||''),String(p.type||'civ'),Math.max(0,Math.min(4,Number(p.rarity)||0)),Math.max(0,Math.min(2000000000,Math.round(Number(p.value)||0))),JSON.stringify(Array.isArray(p.details)?p.details.slice(0,20):[]));
   db.prepare('UPDATE users SET rolls=rolls+1, luck=? WHERE id=?').run(Math.max(0,Math.min(1e9,Math.floor(Number(req.body.luck)||0))),req.user.id);
+  try{ trackTasks(req.user.id,{rarity:Math.max(0,Math.min(4,Number(p.rarity)||0)),country}); }catch(e){ console.error('tasks',e); }
   res.json({ok:true,id,text});
  } catch(e) { if(String(e).includes('UNIQUE')) return fail(res,409,'Такой номер уже существует в общей базе и больше не выпадет'); console.error(e); return fail(res,500,'Не удалось сохранить номер'); }
 });

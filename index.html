@@ -41,7 +41,7 @@ footer{display:flex;gap:12px;justify-content:center;padding:6px 0 10px}footer .p
 .plate.ady .pz{border-left:3px solid #b28c3d;background:linear-gradient(180deg,#142b4b,#203f67)}.plate.ady .pz b,.plate.ady .pz i{color:#fff}.plate.ady .pz u{background:linear-gradient(#00843d 33%,#fff 33% 66%,#d71920 66%)}
 .tile:nth-child(3) .art>.stk>div{transform:rotate(-5deg)}.tile:nth-child(3) .art>.stk>div:nth-child(2){transform:rotate(4deg)}.tile:nth-child(3) .art>.stk>div:nth-child(3){transform:rotate(-2deg)}
 .tile:nth-child(7) .art>.plate,.tile:nth-child(9) .art>.plate{flex-basis:58%;width:58%}.tile:nth-child(7) .art>span,.tile:nth-child(9) .art>span{flex:0 0 auto}
-.tile span{min-height:42px;display:flex;align-items:center;line-height:1.15;overflow-wrap:anywhere}
+.tile>span{min-height:42px;display:flex;align-items:center;line-height:1.15;overflow-wrap:anywhere}
 
 small{color:var(--mt);font-weight:600}
 .plate{position:relative;container-type:inline-size;display:grid;grid-template-columns:75.5% 24.5%;aspect-ratio:4.6/1;width:100%;border-radius:10px;border:3px solid #565760;background:linear-gradient(115deg,#b7b7bc,#fafafd 34%,#d0d0d4 68%,#b0b0b6);box-shadow:inset 0 0 0 2px #ededf0,0 18px 38px #0009;overflow:hidden}
@@ -70,7 +70,7 @@ small{color:var(--mt);font-weight:600}
 #gen s{position:absolute;left:50%;top:50%;width:9px;height:9px;border-radius:50%;pointer-events:none;z-index:2;animation:bs .9s ease-out forwards}@keyframes bs{to{transform:translate(var(--x),var(--y)) scale(.2);opacity:0}}
 .tiles{flex:1;overflow:auto;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-content:start}
 .tile{display:flex;flex-direction:column;height:132px;padding:0;border-radius:22px;overflow:hidden;background:linear-gradient(160deg,#1c4a9c,#102552);border:1px solid #2c4a86;animation:in .4s both}
-.tile.big{grid-column:span 2;height:190px}.tile.w{grid-column:span 2;height:150px}.tile.sm{height:76px}.tile.sm .art{font-size:32px}.tile span{background:#0b0e1c;padding:10px 16px;text-align:left;font-weight:800;font-size:15px;letter-spacing:.03em;text-transform:uppercase}
+.tile.big{grid-column:span 2;height:190px}.tile.w{grid-column:span 2;height:150px}.tile.sm{height:76px}.tile.sm .art{font-size:32px}.tile>span{background:#0b0e1c;padding:10px 16px;text-align:left;font-weight:800;font-size:15px;letter-spacing:.03em;text-transform:uppercase}
 .art{flex:1;display:flex;align-items:center;justify-content:center;font-size:52px}.tile .art{position:relative;min-width:0;padding:12px;gap:10px;overflow:hidden;background:radial-gradient(ellipse at 50% 25%,#ffffff0c,transparent 70%)}
 .tile .art>.plate{flex:0 1 78%;width:78%;min-width:0;max-width:100%;transform:scale(.96);box-shadow:0 8px 18px #0007,inset 0 0 0 1px #fff8}
 .tile .art>.stk{width:100%;height:100%;position:relative;min-width:0;overflow:hidden}
@@ -122,7 +122,7 @@ select{font:inherit;color:var(--tx);background:#14151e;border:1px solid var(--bd
 @keyframes snowfall{to{transform:translate3d(var(--drift),110vh,0) rotate(360deg)}}
 .sq,.pill,.tile,.pick,.card{transition:transform .18s ease,border-color .18s ease,filter .18s ease}
 button:active,.tile:active{transform:scale(.975)}
-.tile{background:linear-gradient(155deg,#1b3c70,#111a30);border-color:#304b78}.tile span{background:#0d1425}
+.tile{background:linear-gradient(155deg,#1b3c70,#111a30);border-color:#304b78}.tile>span{background:#0d1425}
 .tile.ev{display:none}
 .pop{animation:rev 1.35s cubic-bezier(.16,1,.3,1)}
 #pb .pop:has(.plate.pol),#pb .pop:has(.plate.mil){animation-duration:1.35s}
@@ -138,7 +138,7 @@ button:active,.tile:active{transform:scale(.975)}
 @keyframes snowfall{to{transform:translate3d(var(--drift),110vh,0) rotate(360deg)}}
 .sq,.pill,.tile,.pick,.card{transition:transform .18s ease,border-color .18s ease,filter .18s ease}
 button:active,.tile:active{transform:scale(.975)}
-.tile{background:linear-gradient(155deg,#1b3c70,#111a30);border-color:#304b78}.tile span{background:#0d1425}
+.tile{background:linear-gradient(155deg,#1b3c70,#111a30);border-color:#304b78}.tile>span{background:#0d1425}
 .tile.ev{display:none}
 .pop{animation:rev 1.35s cubic-bezier(.16,1,.3,1)}
 #pb .pop:has(.plate.pol),#pb .pop:has(.plate.mil){animation-duration:1.35s}
@@ -154,6 +154,36 @@ button:active,.tile:active{transform:scale(.975)}
 .rarity-epic #pb{animation:epicPulse 1.1s ease-in-out 2}.rarity-legendary #pb{animation:legendPulse 1.15s ease-in-out 2}
 @keyframes epicPulse{0%,100%{filter:drop-shadow(0 0 0 #a855f7)}50%{filter:drop-shadow(0 0 25px #a855f7)}}
 @keyframes legendPulse{0%,100%{filter:drop-shadow(0 0 0 #f59e0b)}50%{filter:drop-shadow(0 0 34px #f59e0b)}}
+
+/* === новые иконки меню === */
+.ic{height:84px;width:auto;flex:0 0 auto;filter:drop-shadow(0 6px 8px #0008)}
+.tile.sm .ic{height:30px;filter:drop-shadow(0 2px 3px #0008)}
+.tile .art>.ic-s{height:38px;width:auto;flex:0 0 auto;filter:drop-shadow(0 3px 4px #0008)}
+.tile .art>.gems2{display:flex;align-items:flex-end;gap:5px;height:84px;padding-bottom:6px}
+.tile .art>.gems2 svg{filter:drop-shadow(0 4px 6px #0008)}
+.tile .art>.bg .st{position:absolute;right:-10px;top:-16px;width:30px;height:30px;filter:drop-shadow(0 3px 5px #0009)}
+.tile{box-shadow:0 8px 18px #0006,inset 0 1px 0 #ffffff22}
+.tile.big .art{padding-top:14px;padding-bottom:6px}
+/* === ежедневные задания === */
+.tk{background:linear-gradient(160deg,#1b3c70,#111a30);border:1px solid #304b78;border-radius:18px;padding:12px 14px;margin-bottom:10px}
+.tk.got{opacity:.55}
+.tk.done:not(.got){border-color:#2c8a55;box-shadow:0 0 14px #22c55e40}
+.tk-h{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.tk-h b{font-size:15px;line-height:1.25}
+.tk-rw{white-space:nowrap;font-weight:800;color:#f6c453;font-size:13px}
+.tk-bar{height:8px;border-radius:4px;background:#0b1224;margin:10px 0 8px;overflow:hidden}
+.tk-bar i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#22c55e,#86efac)}
+.tk-f{display:flex;justify-content:space-between;align-items:center;min-height:30px}
+.tk-ok{color:#22c55e;font-weight:700;font-size:13px}
+.tk-f .pill{padding:8px 16px}
+.adm-tk{display:flex;justify-content:space-between;gap:10px;align-items:center;background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:10px 12px;margin-bottom:6px}
+.adm-tk.off{opacity:.5}
+.adm-tk .col{display:flex;flex-direction:column;gap:6px}
+.adm-tk .pill{padding:7px 12px;font-size:13px}
+/* === выдача номера === */
+.gp-prev{display:flex;justify-content:center;align-items:center;min-height:72px;padding:8px 0}
+.gp-prev .plate{width:72%;max-width:260px}
+#adm-det select,#adm-det input,.adm-form select,.adm-form input{margin-bottom:8px}
 </style></head><body>
 <div id="app">
 <section class="scr on" id="gen"><div class="glow"></div><div class="snow-layer" id="snow" aria-hidden="true"></div>
@@ -206,7 +236,7 @@ const TH=[0,5e3,3e4,3e5,2.5e6];
 const FTH=[0,600,2500,12000,60000];
 const tier=p=>{const c=p.cn||"ru",a=(!["ru","ua","ae"].includes(c)?FTH:TH);return a.reduce((r,t,i)=>p.v>=t*(CS[c]||1)?i:r,0)};
 const nice=v=>{const k=Math.max(0,String(Math.round(v)).length-3);return Math.round(v/10**k)*10**k};
-const txt=p=>{const c=p.cn||"ru",L=p.L||"",d=p.d||"",r=p.reg||"";
+const txt=p=>{const c=p.cn||"ru",L=p.L||"",d=p.d||"",r=p.reg||"";if(p.tx)return p.tx;
  if(c==="ge")return `${L.split("-")[0]||"AB"}-${d||"123"}-${L.split("-")[1]||"CD"}`;
  if(c==="kz")return `${d} ${L} ${r}`;
  if(c==="az")return `${r}-${L}-${d}`;
@@ -241,7 +271,7 @@ const dash=r=>[0,1,2,3,4].map(i=>`<i${i<=r?` style="background:${RL[r][1]}"`:""}
 function toast(m){const t=$("ts");t.textContent=m;t.classList.add("on");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("on"),1600)}
 
 // генерация
-function analyze(p){const cn=p.cn||"ru";if(cn==="ae")return anaAE(p);
+function analyze(p){const cn=p.cn||"ru";if(cn==="ae")return anaAE(p);if(!p.d)return{m:1,t:[],b:1500,cap:3e7};
  let m=1,t=[];const d=p.d,L=p.L,n=d.length,A=[...d].map(Number),u=new Set(d).size;
  if(u===1){m*=400;t.push(n+" одинаковые цифры");if(d[0]==="7")m*=2}
  else if(/^0+[1-9]$/.test(d)){m*=300;t.push("Малый номер")}
@@ -357,29 +387,70 @@ $("auto").onclick=()=>{if(!S.spd)return toast("Авто открывается �
 
 // экраны
 let cur="gen",sel=new Set(),lim=60,q="",regq="",vis=[];
-const back={menu:"gen",col:"menu",safe:"menu",up:"menu",as:"menu",cfg:"gen",cty:"cfg",adm:"menu",cat:"menu",trade:"menu",auction:"menu",online:"menu"};
-const TT={menu:"Меню",col:"Коллекция",safe:"Сейф",up:"Улучшения",as:"Автопродажа",cfg:"Настройка генерации",cty:"Страна",adm:"Админ-панель",cat:"Каталог редкостей",trade:"Трейд номеров",auction:"Аукцион номеров",online:"Игроки онлайн"};
+const back={menu:"gen",col:"menu",safe:"menu",up:"menu",as:"menu",cfg:"gen",cty:"cfg",adm:"menu",tasks:"menu",cat:"menu",trade:"menu",auction:"menu",online:"menu"};
+const TT={menu:"Меню",col:"Коллекция",safe:"Сейф",up:"Улучшения",as:"Автопродажа",cfg:"Настройка генерации",cty:"Страна",adm:"Админ-панель",tasks:"Ежедневные задания",cat:"Каталог редкостей",trade:"Трейд номеров",auction:"Аукцион номеров",online:"Игроки онлайн"};
 function go(s){cur=s;sel.clear();lim=60;q="";$("gen").classList.toggle("on",s==="gen");$("v").classList.toggle("on",s!=="gen");if(s!=="gen")draw()}
 const T=(g,c,a,n,x="")=>`<button class="tile ${c}" ${g==="out"?'data-a="out"':g?`data-go="${g}"`:'data-a="soon"'}>${x}<div class="art">${a}</div><span>${n}</span></button>`;
+/* ---------- иконки меню (SVG) ---------- */
+const I=(w,body)=>`<svg class="${w||"ic"}" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">${body}</svg>`;
+const lg=(id,a,b,v)=>`<linearGradient id="${id}" x1="0" y1="0" x2="${v?0:1}" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>`;
+const ICO={
+ tasks:I("",`<defs>${lg("t1","#f6f9ff","#9fb4e6",1)}${lg("t2","#4ade80","#15a34a")}</defs>
+  <rect x="15" y="14" width="66" height="76" rx="12" fill="url(#t1)"/>
+  <rect x="15" y="14" width="66" height="76" rx="12" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="1.5"/>
+  <rect x="31" y="5" width="34" height="17" rx="8" fill="#334a8c"/><rect x="38" y="10" width="20" height="6" rx="3" fill="#a5b9ee"/>
+  ${[0,1,2].map(i=>{const y=38+i*19;return `<g>${i<2?`<circle cx="30" cy="${y}" r="8" fill="url(#t2)"/><path d="M26 ${y}l3 3.2 6-6.6" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`:`<circle cx="30" cy="${y}" r="7" fill="none" stroke="#7f95cc" stroke-width="3"/>`}<rect x="44" y="${y-3.5}" width="${i===1?24:30}" height="7" rx="3.5" fill="#8da3d8"/></g>`}).join("")}`),
+ safe:I("",`<defs>${lg("s1","#b4c4ee","#566cae",1)}${lg("s2","#41528c","#222d54",1)}${lg("s3","#fde68a","#d99a1e",1)}</defs>
+  <rect x="19" y="84" width="14" height="7" rx="3" fill="#2a3566"/><rect x="63" y="84" width="14" height="7" rx="3" fill="#2a3566"/>
+  <rect x="9" y="8" width="78" height="77" rx="13" fill="url(#s1)"/>
+  <rect x="17" y="16" width="62" height="61" rx="8" fill="url(#s2)" stroke="#92a8de" stroke-width="2.5"/>
+  <circle cx="48" cy="46" r="19" fill="#e4ebfc"/><circle cx="48" cy="46" r="13" fill="#27356a"/>
+  <path d="M48 24v10M48 58v10M26 46h10M60 46h10M32.5 30.5l7 7M55.5 54.5l7 7M63.5 30.5l-7 7M40.5 54.5l-7 7" stroke="#e4ebfc" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="48" cy="46" r="5" fill="url(#s3)"/>
+  <rect x="4" y="22" width="7" height="14" rx="3" fill="#8fa4d8"/><rect x="4" y="58" width="7" height="14" rx="3" fill="#8fa4d8"/>`),
+ gar:I("",`<defs>${lg("g1","#7e92c8","#3a4a80",1)}${lg("g2","#c6d3f3","#7f93c9",1)}</defs>
+  <path d="M5 46 48 13l43 33v39a5 5 0 0 1-5 5H10a5 5 0 0 1-5-5Z" fill="url(#g1)"/>
+  <path d="M5 46 48 13l43 33" fill="none" stroke="#c6d3f3" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
+  <rect x="18" y="45" width="60" height="45" rx="3" fill="#121a36"/>
+  ${[0,1,2,3].map(i=>`<rect x="20" y="${47+i*10.5}" width="56" height="8.5" rx="2.5" fill="url(#g2)"/><rect x="20" y="${47+i*10.5}" width="56" height="2.5" rx="1.2" fill="#fff" opacity=".55"/>`).join("")}
+  <circle cx="48" cy="33" r="4" fill="#f6c453"/>`),
+ ups:I("",`<defs>${lg("u1","#145b33","#0b2c19",1)}${lg("u2","#86efac","#16a34a",1)}</defs>
+  <circle cx="48" cy="50" r="40" fill="url(#u1)" stroke="#22c55e" stroke-width="5"/>
+  <circle cx="48" cy="50" r="33" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="2"/>
+  <path d="M48 22 73 51H58v22H38V51H23Z" fill="url(#u2)" stroke="#bbf7d0" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M30 80h36" stroke="#22c55e" stroke-width="3" stroke-linecap="round" opacity=".6"/>`),
+ arrow:I("ic-s",`<defs>${lg("a1","#86efac","#16a34a")}</defs><path d="M10 26 40 48 10 70v-14l14-8-14-8Z" fill="url(#a1)"/><path d="M44 26 74 48 44 70v-14l14-8-14-8Z" fill="url(#a1)" opacity=".7"/>`),
+ coin:I("ic-s",`<defs>${lg("c1","#fde68a","#d6961a",1)}</defs><circle cx="48" cy="48" r="40" fill="url(#c1)" stroke="#b9791a" stroke-width="4"/><circle cx="48" cy="48" r="30" fill="none" stroke="#fff6c8" stroke-opacity=".8" stroke-width="3"/><text x="48" y="62" text-anchor="middle" font-size="40" font-weight="900" fill="#8a5a0c" font-family="Arial,Helvetica,sans-serif">₽</text>`),
+ bag:I("ic-s",`<defs>${lg("b1","#fcd77a","#c98a14",1)}</defs><path d="M33 12h30l-7 15c19 9 28 24 26 41-2 16-16 24-34 24S16 84 14 68c-2-17 7-32 26-41Z" fill="url(#b1)" stroke="#a8730f" stroke-width="3" stroke-linejoin="round"/><rect x="31" y="22" width="34" height="8" rx="4" fill="#8a5a0c"/><text x="48" y="74" text-anchor="middle" font-size="36" font-weight="900" fill="#7a4d08" font-family="Arial,Helvetica,sans-serif">₽</text>`),
+ star:`<svg class="st" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg"><defs>${lg("st1","#fff0a6","#f2a30f",1)}</defs><path d="m48 6 12.5 28 30.5 3.2-22.9 20.5 6.7 30L48 72.3 25.2 87.7l6.7-30L9 37.2 39.5 34Z" fill="url(#st1)" stroke="#c2810c" stroke-width="3" stroke-linejoin="round"/></svg>`,
+ auc:I("",`<defs>${lg("h1","#fde68a","#d99a1e",1)}${lg("h2","#c08a3e","#7a5220",1)}${lg("h3","#8fa4d8","#3f5192",1)}</defs>
+  <rect x="10" y="78" width="76" height="12" rx="5" fill="url(#h3)"/><rect x="10" y="78" width="76" height="3" rx="1.5" fill="#fff" opacity=".35"/>
+  <g transform="rotate(-38 40 34)"><rect x="35.5" y="30" width="9" height="52" rx="4.5" fill="url(#h2)"/><rect x="12" y="14" width="56" height="26" rx="8" fill="url(#h1)"/><rect x="20" y="14" width="7" height="26" fill="#fff" opacity=".3"/><rect x="53" y="14" width="7" height="26" fill="#000" opacity=".14"/></g>
+  <circle cx="74" cy="30" r="3" fill="#fde68a"/><circle cx="82" cy="40" r="2" fill="#fde68a" opacity=".7"/><circle cx="68" cy="20" r="2" fill="#fde68a" opacity=".7"/>`),
+ adm:I("",`<defs>${lg("w1","#c4b5fd","#6d49d6",1)}</defs>
+  ${Array.from({length:8},(_,i)=>`<rect x="40" y="5" width="16" height="20" rx="4" fill="url(#w1)" transform="rotate(${i*45} 48 48)"/>`).join("")}
+  <circle cx="48" cy="48" r="31" fill="url(#w1)"/><circle cx="48" cy="48" r="13" fill="#241a4d"/><circle cx="48" cy="48" r="31" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="2"/>`),
+ out:I("",`<defs>${lg("o1","#fda4af","#e11d48")}</defs>
+  <path d="M42 14H22a8 8 0 0 0-8 8v52a8 8 0 0 0 8 8h20" fill="none" stroke="#dbe6ff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M36 48h46M64 28l20 20-20 20" fill="none" stroke="url(#o1)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>`)
+};
+const gem=(c,w,h)=>`<svg viewBox="0 0 40 48" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg"><polygon points="20,2 38,15 20,46 2,15" fill="${c}"/><polygon points="20,2 38,15 20,15" fill="#fff" opacity=".4"/><polygon points="20,2 2,15 20,15" fill="#fff" opacity=".18"/><polygon points="2,15 20,15 20,46" fill="#000" opacity=".2"/><polygon points="38,15 20,15 20,46" fill="#000" opacity=".06"/><polygon points="20,2 38,15 2,15" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1"/></svg>`;
+const cnI=(c,p)=>CN[c]||{n:(p&&p.cname)||String(c).toUpperCase(),f:c};
 const stk=a=>`<div class="stk">${a.map((p,i)=>`<div style="top:${i*28}%;left:${i*8}%;z-index:${i}">${plate({cn:"ru",ty:"civ",...p},1)}</div>`).join("")}</div>`;
-const CAR=`<svg viewBox="0 0 220 80" width="74%"><path d="M10 62Q14 44 52 40L82 14Q118 6 150 32Q196 36 212 62Z" fill="#c8cde0"/><path d="M92 20h28q20 6 30 16H88Z" fill="#26324d"/><circle cx="62" cy="62" r="13" fill="#0d0e17" stroke="#8b8fa3" stroke-width="4"/><circle cx="164" cy="62" r="13" fill="#0d0e17" stroke="#8b8fa3" stroke-width="4"/></svg>`;
-const SAFE=`<svg viewBox="0 0 90 80" width="46%"><rect x="6" y="6" width="78" height="68" rx="9" fill="#51648c" stroke="#9db0d8" stroke-width="3"/><rect x="14" y="14" width="62" height="52" rx="5" fill="#26324d"/><circle cx="45" cy="40" r="14" fill="#cfd6e8"/><circle cx="45" cy="40" r="5" fill="#26324d"/><path d="M45 28v6M45 46v6M33 40h6M51 40h6" stroke="#26324d" stroke-width="3"/></svg>`;
-const GAR=`<svg viewBox="0 0 120 80" width="60%"><path d="M6 76V30L60 6l54 24v46Z" fill="#3a4a73" stroke="#8fa3cf" stroke-width="3" stroke-linejoin="round"/><rect x="24" y="32" width="72" height="44" fill="#1b1f2c"/><path d="M24 44h72M24 54h72M24 64h72" stroke="#6b7ba3" stroke-width="3"/></svg>`;
-const UPS=`<svg viewBox="0 0 100 80" width="46%"><circle cx="50" cy="40" r="34" fill="#12301f" stroke="#22c55e" stroke-width="4"/><path d="M50 20l19 22H56v18H44V42H31Z" fill="#22c55e"/></svg>`;
 const menu=()=>`<div class="tiles">`+[
  T("gen","big",plate({ty:"civ",L:"ААА",d:"777",reg:"777"}),"Генератор"),
- T("","w",`<div class="ck"><p><b>✓</b><i></i></p><p><b>✓</b><i></i></p><p><b></b><i></i></p></div>`,"Ежедневные задания"),
+ T("tasks","w",ICO.tasks,"Ежедневные задания"),
  T("col","",stk([{L:"ВЕЕ",d:"789",reg:"15"},{L:"ААА",d:"777",reg:"77"},{L:"КАО",d:"004",reg:"18"}]),"Коллекция"),
- T("safe","or",SAFE,"Сейф"),
- T("","",GAR,"Гараж"),
- T("up","gr",UPS,"Улучшения"),
- T("as","",plate({ty:"civ",L:"ЕВК",d:"123",reg:"77"},1)+'<b style="font-size:30px">➜</b><span style="font-size:36px">💵</span>',"Автопродажа"),
- T("","",`<div class="bg" style="position:relative">${plate({ty:"civ",L:"ААА",d:"777",reg:"77"},1)}<b style="position:absolute;right:-8px;top:-16px;font-size:28px">⭐</b></div>`,"Избранные номера"),
- T("","",plate({ty:"civ",L:"ААА",d:"717",reg:"77"},1)+'<span style="font-size:36px">💰</span>',"Скупка номеров"),
- T("auction","gold",`<div class="gems"><i style="background:#f6c453;height:42px;box-shadow:0 0 16px #f6c453"></i><i style="background:#b8c7ff;height:28px;box-shadow:0 0 14px #b8c7ff"></i></div>` ,"Аукцион номеров"),
- T("cat","pu",`<div class="gems">${RL.map((x,i)=>`<i style="background:${x[1]};height:${16+i*10}px;box-shadow:0 0 12px ${x[1]}"></i>`).join("")}</div>`,"Каталог редкостей"),
- ...(U==="admin"?[T("adm","w sm","🛠️","Админ-панель")]:[]),
- T("out","w sm","🚪","Выйти ("+U+")")].join("")+"</div>";
+ T("safe","or",ICO.safe,"Сейф"),
+ T("","",ICO.gar,"Гараж"),
+ T("up","gr",ICO.ups,"Улучшения"),
+ T("as","",plate({ty:"civ",L:"ЕВК",d:"123",reg:"77"},1)+ICO.arrow+ICO.coin,"Автопродажа"),
+ T("","",`<div class="bg" style="position:relative">${plate({ty:"civ",L:"ААА",d:"777",reg:"77"},1)}${ICO.star}</div>`,"Избранные номера"),
+ T("","",plate({ty:"civ",L:"ААА",d:"717",reg:"77"},1)+ICO.bag,"Скупка номеров"),
+ T("auction","gold",ICO.auc,"Аукцион номеров"),
+ T("cat","pu",`<div class="gems2">${RL.map((x,i)=>`<span style="filter:drop-shadow(0 0 8px ${x[1]}aa)">${gem(x[1],20+i*4,26+i*5)}</span>`).join("")}</div>`,"Каталог редкостей"),
+ ...(U==="admin"?[T("adm","w sm",ICO.adm,"Админ-панель")]:[]),
+ T("out","w sm",ICO.out,"Выйти ("+U+")")].join("")+"</div>";
 function coll(){const sf=cur==="safe",L=S.inv.filter(p=>!!p.sf===sf);
  return `<div class="sub"><span>Стоимость ${sf?"сейфа":"коллекции"}: ${rub(L.reduce((s,p)=>s+p.v,0))}</span><span>${S.inv.length} / 1000</span></div>
 <div class="chips2"><button class="pill s${S.fr?" act":""}" data-a="fl">Фильтры${S.fr?": "+RL[S.fr][0]+"+":""}</button>${[["d","Дата"],["p","Цена"],["r","Редкость"],["a","А–Я"]].map(([k,n])=>`<button class="pill s${S.sort===k?" act":""}" data-so="${k}">${n}${S.sort===k?(S.dir<0?" ▼":" ▲"):""}</button>`).join("")}</div>
@@ -388,7 +459,7 @@ function coll(){const sf=cur==="safe",L=S.inv.filter(p=>!!p.sf===sf);
 function lstDraw(){const sf=cur==="safe",k=S.sort,d=S.dir;
  vis=S.inv.filter(p=>!!p.sf===sf&&p.r>=(S.fr||0)&&(!q||(txt(p)+p.reg).replace(/ /g,"").toLowerCase().includes(q)));
  vis.sort((a,b)=>d*(k==="p"?a.v-b.v:k==="r"?a.r-b.r||a.v-b.v:k==="a"?txt(a).localeCompare(txt(b),"ru"):(a.t0||0)-(b.t0||0)));
- const rows=vis.slice(0,lim).map(p=>`<div class="it${sel.has(p.id)?" sel":""}" data-id="${p.id}" style="--c:${RL[p.r][1]}">${plate(p,1)}<div class="inf"><small>${CN[p.cn||"ru"].n.replace(" (Дубай)","")} · ${TY[p.ty||"civ"][0]}</small><small>Номер: ${txt(p)}</small><div class="bar">${dash(p.r)}</div><b style="color:${RL[p.r][1]}">${rub(p.v)}</b></div></div>`).join("");
+ const rows=vis.slice(0,lim).map(p=>`<div class="it${sel.has(p.id)?" sel":""}" data-id="${p.id}" style="--c:${RL[p.r][1]}">${plate(p,1)}<div class="inf"><small>${cnI(p.cn||"ru",p).n.replace(" (Дубай)","")} · ${TY[p.ty||"civ"][0]}</small><small>Номер: ${txt(p)}</small><div class="bar">${dash(p.r)}</div><b style="color:${RL[p.r][1]}">${rub(p.v)}</b></div></div>`).join("");
  $("lst").innerHTML=(rows+(vis.length>lim?`<button class="pill" data-a="more" style="width:100%">Показать ещё (${vis.length-lim})</button>`:""))||'<p class="mut">Здесь пока пусто</p>';foot()}
 function foot(){const b=$("b1");if(!b)return;b.textContent=cur==="safe"?"Достать из сейфа":"Поместить в сейф";b.classList.toggle("off",!sel.size);const c=$("b2");if(c)c.classList.toggle("off",!sel.size);
  document.querySelector("[data-a=all]").textContent=sel.size&&sel.size>=vis.length?"Снять выбор":"Выбрать всё"}
@@ -405,6 +476,14 @@ const cty=()=>`${cOpen("ae")?"":`<p class="mut">Остальные страны 
 const catS=()=>`<div class="lst"><p class="mut">Редкость определяется реальной рыночной стоимостью номера. Для ОАЭ пороги в 8 раз выше — цены там намного больше.</p>`+RL.map((x,i)=>`<div class="card"><div><b style="color:${x[1]}">${x[0]}</b><p class="mut">от ${rub(TH[i])}</p></div><span class="bar">${dash(i)}</span></div>`).join("")+"</div>";
 const admS=()=>`<div class="lst"><details><summary style="cursor:pointer;font-weight:700;padding:8px 0">⚙️ Сервер</summary><input id="adm-api" placeholder="https://api.example.com" autocapitalize="none" autocorrect="off" spellcheck="false" value="${(()=>{try{return localStorage.getItem("nomera_api_base")||DEFAULT_API||""}catch(e){return DEFAULT_API||""}})()}"><div class="row"><button class="pill" data-a="apiSave">Сохранить</button><button class="pill" data-a="apiCheck">Проверить</button></div><p id="adm-api-st" class="mut"></p></details>
 <details id="adm-stats-box"><summary style="cursor:pointer;font-weight:700;padding:8px 0">📊 Общая статистика</summary><button class="pill" data-a="adminStats">Обновить</button><div id="admin-stats" class="lst"><p class="mut">Нажми «Обновить».</p></div></details>
+<details id="adm-tk-box"><summary style="cursor:pointer;font-weight:700;padding:8px 0">📝 Ежедневные задания</summary><div class="adm-form"><div id="adm-tk-list" class="lst" style="overflow:visible"><p class="mut">Загрузка…</p></div><h3>Новое задание</h3>
+<select id="tk-kind"><option value="rolls">Сделать N бросков</option><option value="rarity">Получить N номеров заданной редкости</option><option value="country">Сделать N бросков в стране</option></select>
+<div id="tk-par"></div>
+<input id="tk-n" type="number" inputmode="numeric" min="1" placeholder="Сколько нужно (число)">
+<div class="row"><input id="tk-rub" type="number" inputmode="numeric" min="0" placeholder="Награда, ₽"><input id="tk-usd" type="number" inputmode="numeric" min="0" placeholder="Награда, $"></div>
+<input id="tk-title" placeholder="Своё название (необязательно)">
+<button class="pill" data-a="taskAdd" style="width:100%">Добавить задание</button>
+<p class="mut">Задания обновляются каждый день в 00:00 по Москве. Прогресс считается только у игроков с онлайн-аккаунтом.</p></div></details>
 <h3>Игроки <small id="adm-count" class="mut"></small></h3>
 <input id="adm-q" placeholder="🔍 Поиск по логину" autocapitalize="none" autocorrect="off" spellcheck="false">
 <div id="admin-users" class="lst" style="max-height:40vh;overflow-y:auto;-webkit-overflow-scrolling:touch"><p class="mut">Загрузка списка…</p></div>
@@ -420,21 +499,104 @@ function admSelect(login){admSel=login;admList();const d=$("adm-det");if(!d)retu
  d.innerHTML=`<h3>Игрок: ${esc(login)}</h3><div id="adm-st"></div><input id="at" type="hidden" value="${esc(login)}">
 <details><summary style="cursor:pointer;font-weight:700;padding:8px 0">🍀 Выдать удачу</summary><div class="row"><input id="al2" type="number" placeholder="уровень, например 50"><button class="pill" data-a="agl">Выдать</button></div></details>
 <details><summary style="cursor:pointer;font-weight:700;padding:8px 0">💰 Выдать деньги</summary><div class="row"><input id="am" type="number" placeholder="₽"><input id="ad" type="number" placeholder="$"><button class="pill" data-a="agm">Выдать</button></div></details>
-<details><summary style="cursor:pointer;font-weight:700;padding:8px 0">🔢 Выдать номер</summary><div class="row"><select id="ty"><option value="civ">Гражд.</option><option value="taxi">Такси</option><option value="pol">Полиция</option><option value="mil">Военный</option></select><input id="pl" placeholder="Буквы"></div><div class="row"><input id="pd" placeholder="Цифры"><input id="pr" placeholder="Регион"></div><button class="pill" data-a="agp" style="width:100%">Выдать номер</button></details>
+<details><summary style="cursor:pointer;font-weight:700;padding:8px 0">🔢 Выдать номер</summary><div class="adm-form"><select id="gp-c">${Object.keys(CN).map(k=>`<option value="${k}">${esc(CN[k].n)}</option>`).join("")}<option value="__x">🌍 Другая страна…</option></select><div id="gp-fields"></div><select id="gp-q"><option value="">Редкость: авто</option>${RL.map((x,i)=>`<option value="${i}">Редкость: ${x[0]}</option>`).join("")}</select><div id="gp-prev" class="gp-prev"></div><button class="pill" data-a="agp" style="width:100%">Выдать номер</button></div></details>
 <details id="adm-pl-box"><summary style="cursor:pointer;font-weight:700;padding:8px 0">📋 Номера игрока</summary><div id="adm-pl" class="lst"><p class="mut">Загрузка…</p></div></details>
 <p class="mut">Выдача придёт игроку в течение ~30 секунд или при следующем входе.</p>`;
- admStat();d.scrollIntoView({behavior:"smooth",block:"nearest"});
+ admStat();gpFields();d.scrollIntoView({behavior:"smooth",block:"nearest"});
  apiReq("/api/players/"+encodeURIComponent(login)+"/plates").then(r=>{const el=$("adm-pl");if(el&&admSel===login)el.innerHTML=r.plates.slice(0,50).map(p=>`<div class="card" style="padding:8px 12px;margin-bottom:4px"><b>${esc(p.text)}</b><small style="color:${RL[p.rarity||0][1]}">${RL[p.rarity||0][0]} · ${rub(p.value)}</small></div>`).join("")||'<p class="mut">Номеров нет</p>'}).catch(()=>{const el=$("adm-pl");if(el)el.innerHTML='<p class="mut">Не удалось загрузить</p>'})}
-function admInit(){admSel="";apiAdminUsers()}
+function admInit(){admSel="";apiAdminUsers();tkPar();apiAdminTasks()}
 async function adGrant(body){const t=$("at").value.trim();if(!t)return toast("Выбери игрока");try{await apiReq("/api/admin/grant",{login:t,...body});toast("Выдано: "+t);apiAdminUsers()}catch(e){toast(e.message)}}
 const onlineS=()=>`<div class="card"><div><b><span class="online-status">Онлайн-лобби</span></b><p class="mut">Список игроков доступен через сервер.</p></div></div><div class="card"><div><b>Аккаунт: ${U||"не выполнен вход"}</b><p class="mut">Все игроки должны быть на одном сервере.</p></div></div><button class="pill" data-a="refreshOnline">Обновить список</button><div id="online-list" class="lst"><p class="mut">Запусти сервер, чтобы увидеть игроков.</p></div>`;
 const auctionS=()=>`<div class="card"><div><b>Выставить номер</b><p class="mut">Укажи номер из своей серверной коллекции и цену в рублях.</p></div></div><input id="auc-plate" placeholder="Номер или ID из коллекции"><input id="auc-price" type="number" min="1" step="1" placeholder="Цена, ₽"><button class="pill" style="width:100%" data-a="auctionList">Выставить на аукцион</button><h3>Лоты игроков</h3><button class="pill" data-a="auctionRefresh">Обновить аукцион</button><div id="auction-list" class="lst"><p class="mut">Загружаю лоты…</p></div><h3>Мои лоты</h3><div id="auction-mine" class="lst"></div><p class="mut">Покупка списывает серверные рубли и передаёт номер покупателю. Для общего аукциона всем игрокам нужен один сервер.</p>`;
 const tradeS=()=>`<div class="card"><div><b>Передать номер</b><p class="mut">По логину получателя.</p></div></div><input id="tr-to" placeholder="Логин получателя"><input id="tr-id" placeholder="Номер из коллекции (например А777АА)"><button class="pill" data-a="transfer">Передать номер</button><h3>Обмен с доплатой</h3><input id="ex-to" placeholder="Логин игрока"><button class="pill" data-a="lookupPlates">Показать номера игрока</button><div id="other-plates" class="lst"></div><input id="ex-mine" placeholder="Мой номер из коллекции"><input id="ex-theirs" placeholder="Номер игрока (выбери ниже)"><div class="row"><input id="ex-cash" type="number" min="0" placeholder="Доплата, ₽"><input id="ex-usd" type="number" min="0" placeholder="Доплата, $"></div><button class="pill" data-a="tradeOffer">Предложить обмен</button><button class="pill" data-a="tradeInbox">Входящие предложения</button><div id="trade-inbox" class="lst"></div><p class="mut">Не сообщай пароль другим игрокам. Для обмена оба аккаунта должны быть на одном сервере.</p>`;
 
 
+/* ---------- выдача номера любой страны ---------- */
+const LATC={A:"А",B:"В",E:"Е",K:"К",M:"М",H:"Н",O:"О",P:"Р",C:"С",T:"Т",Y:"У",X:"Х"};
+const GS={
+ ru:{ph:["ААА","777","77"],rl:"Регион (2–3 цифры)"},
+ ua:{nl:2,nd:4,r:"l2",cy:"ua",ph:["КА","0777","АА"],rl:"Код региона (2 буквы)"},
+ ae:{nl:[1,2],nd:[1,5],r:"em",ph:["A","777",""]},
+ ge:{nl:4,nd:3,r:"",ph:["ABCD","123",""],ge:1},
+ kz:{nl:3,nd:3,r:"d2",ph:["ABC","123","01"],rl:"Регион (2 цифры)"},
+ az:{nl:2,nd:3,r:"d2",ph:["AB","123","10"],rl:"Регион (2 цифры)"},
+ uz:{nl:3,nd:3,r:"d2",ph:["ABC","123","01"],rl:"Регион (2 цифры)"},
+ kg:{nl:3,nd:3,r:"d2",ph:["ABC","123","01"],rl:"Регион (2 цифры)"},
+ tj:{nl:2,nd:4,r:"d2",ph:["AB","1234","01"],rl:"Регион (2 цифры)"},
+ tr:{nl:3,nd:4,r:"d2",ph:["ABC","1234","34"],rl:"Код города (2 цифры)"},
+ us:{nl:3,nd:4,r:"",ph:["ABC","1234",""]},
+ ng:{nl:3,nd:3,r:"l3",ph:["ABC","123","LAG"],rl:"Штат (3 буквы)"},
+ af:{nl:2,nd:4,r:"l3",ph:["AB","1234","KBL"],rl:"Провинция (3 буквы)"},
+ pt:{nl:4,nd:4,r:"",ph:["ABCD","1234",""]},
+ am:{nl:2,nd:3,r:"d2",ph:["ՍՍ","123","01"],rl:"Регион (2 цифры)",any:1},
+ ady:{nl:3,nd:3,r:"ady",cy:"ru",ph:["ААА","777",""]}
+};
+const RUT={civ:{nl:3,nd:3,ph:["ААА","777"]},taxi:{nl:2,nd:3,ph:["АА","777"]},pol:{nl:1,nd:4,ph:["А","0001"]},mil:{nl:2,nd:4,ph:["АА","0001"]}};
+const inR=(v,x)=>Array.isArray(x)?v>=x[0]&&v<=x[1]:v===x;
+const rngT=x=>Array.isArray(x)?x[0]+"–"+x[1]:x;
+function gpFields(){const c=($("gp-c")||{}).value,el=$("gp-fields");if(!el)return;
+ if(c==="__x"){el.innerHTML=`<input id="gp-xn" placeholder="Название страны, например Германия" autocomplete="off"><div class="row"><input id="gp-xc" placeholder="Код: DE" maxlength="6" autocapitalize="characters" autocomplete="off"><input id="gp-xt" placeholder="Номер целиком: B AB 1234" autocapitalize="characters" autocomplete="off"></div>`;return gpPrev()}
+ const g=GS[c];if(!g)return;let ph=g.ph,t="";
+ if(c==="ru"){const ty=($("gp-t")||{}).value||"civ";ph=[RUT[ty].ph[0],RUT[ty].ph[1],g.ph[2]];t=`<select id="gp-t">${Object.keys(TY).map(k=>`<option value="${k}"${k===ty?" selected":""}>${TY[k][0]}</option>`).join("")}</select>`}
+ let r="";
+ if(g.r==="em")r=`<select id="gp-r">${Object.keys(EM).map(k=>`<option value="${k}">${esc(EM[k].n)}</option>`).join("")}</select>`;
+ else if(c==="ru"||(g.r&&g.r!=="ady"))r=`<input id="gp-r" placeholder="${g.rl}: ${ph[2]}" autocomplete="off" autocapitalize="characters">`;
+ el.innerHTML=t+`<div class="row"><input id="gp-l" placeholder="Буквы: ${ph[0]}" autocomplete="off" autocapitalize="characters"><input id="gp-d" inputmode="numeric" placeholder="Цифры: ${ph[1]}" autocomplete="off"></div>`+r;gpPrev()}
+function gpRead(){const c=$("gp-c").value,q=$("gp-q").value,id=Date.now()+"_"+rnd(1e6);let b;
+ if(c==="__x"){const name=$("gp-xn").value.trim().slice(0,30),code=$("gp-xc").value.trim().toLowerCase().replace(/[^a-z0-9_]/g,"").slice(0,8),tx=$("gp-xt").value.trim().toUpperCase().replace(/\s+/g," ").slice(0,30);
+  if(name.length<2)return{err:"Укажи название страны"};if(code.length<2)return{err:"Код страны: 2–8 латинских букв или цифр"};if(CN[code])return{err:"Эта страна уже есть в списке — выбери её выше"};if(!tx)return{err:"Введи номер целиком"};
+  b=mkV({cn:code,cname:name,tx,L:(tx.match(/\p{L}/gu)||[]).join(""),d:tx.replace(/\D/g,""),reg:"",ty:"civ",id,t0:Date.now()})}
+ else{const g=GS[c];let ty="civ",nl=g.nl,nd=g.nd,r=g.r;
+  if(c==="ru"){ty=$("gp-t").value;nl=RUT[ty].nl;nd=RUT[ty].nd;r="d23"}
+  const cy=c==="ru"?"ru":g.cy||"",ok=cy==="ua"?LU:cy?LET:"";
+  const cl=v=>{let x=String(v||"").toUpperCase();if(cy){x=x.replace(/[ABEKMHOPCTYX]/g,m=>LATC[m]);if(cy==="ua")x=x.replace(/I/g,"І")}return(x.match(/\p{L}/gu)||[]).join("")};
+  let L=cl($("gp-l").value);
+  if(ok&&[...L].some(x=>!ok.includes(x)))return{err:"Допустимые буквы: "+ok};
+  if(!ok&&!g.any&&/[^A-Z]/.test(L))return{err:"Буквы — только латиница (A–Z)"};
+  if(!inR(L.length,nl))return{err:"Букв должно быть: "+rngT(nl)};
+  if(g.ge)L=L.slice(0,2)+"-"+L.slice(2);
+  let d=$("gp-d").value.replace(/\D/g,"");if(!Array.isArray(nd))d=d.padStart(nd,"0");
+  if(!inR(d.length,nd))return{err:"Цифр должно быть: "+rngT(nd)};
+  let reg="";
+  if(r==="em"){reg=$("gp-r").value;if(!EM[reg])return{err:"Выбери эмират"}}
+  else if(r==="d2"||r==="d23"){reg=($("gp-r").value||"").replace(/\D/g,"");if(r==="d2")reg=reg.padStart(2,"0");if(r==="d2"?reg.length!==2:(reg.length<2||reg.length>3))return{err:r==="d2"?"Регион: 2 цифры":"Регион: 2–3 цифры"}}
+  else if(r==="l2"||r==="l3"){reg=cl($("gp-r").value);if(ok&&[...reg].some(x=>!ok.includes(x)))return{err:"Допустимые буквы: "+ok};if(reg.length!==(r==="l2"?2:3))return{err:"Код региона: "+(r==="l2"?2:3)+" буквы"}}
+  else if(r==="ady")reg="01";
+  b=mkV({cn:c,ty,L,d,reg,id,t0:Date.now()})}
+ if(q!==""){const r=+q,cn=b.cn,arr=["ru","ua","ae"].includes(cn)?TH:FTH,m=CS[cn]||1,lo=arr[r]*m,hi=r<4?arr[r+1]*m-1:2e9;b.v=Math.max(lo,Math.min(b.v||lo,hi));b.r=tier(b)}
+ return{b}}
+function gpPrev(){const el=$("gp-prev");if(!el)return;let r;try{r=gpRead()}catch(e){r={err:"…"}}
+ el.innerHTML=r.err?`<span class="mut">${esc(r.err)}</span>`:plate(r.b)}
+function gpGrant(){const r=gpRead();if(r.err)return toast(r.err);const b=r.b;return adGrant({kind:"plate",plate:{text:txt(b),country:b.cn,countryName:b.cname||"",region:b.reg,letters:b.L,digits:b.d,type:b.ty,rarity:b.r,value:b.v,details:b.t}})}
+
+/* ---------- ежедневные задания ---------- */
+const pl=(n,a,b,c)=>{n=Math.abs(n);const m=n%100,k=n%10;return m>10&&m<15?c:k===1?a:k>1&&k<5?b:c};
+const cnName=c=>(CN[c]?CN[c].n:String(c).toUpperCase()).replace(" (Дубай)","");
+const tkTitle=(k,n,r,c)=>k==="rolls"?`Сделай ${n} ${pl(n,"бросок","броска","бросков")}`:k==="rarity"?`Получи ${n} ${pl(n,"номер","номера","номеров")} редкости «${RL[r][0]}» или выше`:`Сделай ${n} ${pl(n,"бросок","броска","бросков")} в стране «${cnName(c)}»`;
+function tkPar(){const k=$("tk-kind"),el=$("tk-par");if(!k||!el)return;
+ el.innerHTML=k.value==="rarity"?`<select id="tk-r">${RL.map((x,i)=>`<option value="${i}"${i===2?" selected":""}>Редкость от: ${x[0]}</option>`).join("")}</select>`:k.value==="country"?`<select id="tk-c">${Object.keys(CN).map(x=>`<option value="${x}">${esc(cnName(x))}</option>`).join("")}</select>`:""}
+const tkRw=t=>[t.reward_rub?rub(t.reward_rub):"",t.reward_usd?t.reward_usd+" $":""].filter(Boolean).join(" + ");
+async function apiAdminTasks(){const el=$("adm-tk-list");if(!el)return;
+ try{const d=await apiReq("/api/admin/tasks");
+  el.innerHTML=d.tasks.map(t=>`<div class="adm-tk${t.active?"":" off"}"><div><b>${esc(t.title)}</b><p class="mut">Награда: ${tkRw(t)} · выполнили сегодня: ${t.done_today}${t.active?"":" · выключено"}</p></div><div class="col"><button class="pill" data-a="taskTog" data-tid="${t.id}">${t.active?"Выключить":"Включить"}</button><button class="pill" data-a="taskDel" data-tid="${t.id}">Удалить</button></div></div>`).join("")||'<p class="mut">Заданий пока нет — добавь первое ниже.</p>'}
+ catch(e){el.innerHTML=`<p class="mut">${esc(e.message)}</p>`}}
+async function apiTaskAdd(){const k=$("tk-kind").value,n=Math.floor(+$("tk-n").value),ru=Math.floor(+$("tk-rub").value||0),us=Math.floor(+$("tk-usd").value||0),r=k==="rarity"?+$("tk-r").value:0,c=k==="country"?$("tk-c").value:"";
+ if(!(n>=1))return toast("Укажи, сколько нужно сделать");if(!ru&&!us)return toast("Укажи награду в ₽ или $");
+ const title=$("tk-title").value.trim()||tkTitle(k,n,r,c);
+ try{await apiReq("/api/admin/tasks",{kind:k,target:n,minRarity:r,country:c,rewardRub:ru,rewardUsd:us,title});toast("Задание добавлено");["tk-n","tk-rub","tk-usd","tk-title"].forEach(i=>$(i).value="");apiAdminTasks()}catch(e){toast(e.message)}}
+async function apiTaskAdm(kind,id){try{if(kind==="del"&&!confirm("Удалить это задание насовсем?"))return;await apiReq("/api/admin/tasks/"+id+"/"+(kind==="del"?"delete":"toggle"),{});apiAdminTasks()}catch(e){toast(e.message)}}
+const tkCard=t=>{const done=t.progress>=t.target,pr=Math.min(100,t.progress/t.target*100);
+ return `<div class="tk${done?" done":""}${t.claimed?" got":""}"><div class="tk-h"><b>${esc(t.title)}</b><span class="tk-rw">${tkRw(t)}</span></div><div class="tk-bar"><i style="width:${pr}%"></i></div><div class="tk-f"><small class="mut">${Math.min(t.progress,t.target)} / ${t.target}</small>${t.claimed?'<span class="tk-ok">✓ Получено</span>':done?`<button class="pill" data-a="taskClaim" data-tid="${t.id}">Забрать</button>`:""}</div></div>`};
+const tasksS=()=>`<div id="tk-list" class="lst"><p class="mut">Загружаю задания…</p></div><p class="mut">Задания обновляются каждый день в 00:00 по Москве. Прогресс считается только в онлайн-аккаунте.</p>`;
+async function apiTasks(){const el=$("tk-list");
+ if(!U||!LS.get("nomera_token")){if(el)el.innerHTML='<p class="mut">Задания доступны только в онлайн-аккаунте — войди через сервер.</p>';return}
+ try{const d=await apiReq("/api/tasks");if(el)el.innerHTML=d.tasks.map(tkCard).join("")||'<p class="mut">Сегодня заданий нет — загляни позже.</p>'}
+ catch(e){if(el)el.innerHTML=`<p class="mut">${esc(e.message)}</p>`}}
+async function apiTaskClaim(id){try{const d=await apiReq("/api/tasks/"+id+"/claim",{});S.m+=d.rubles||0;S.usd+=d.dollars||0;save();hud();toast("Награда: "+tkRw({reward_rub:d.rubles,reward_usd:d.dollars}));apiTasks()}catch(e){toast(e.message);apiTasks()}}
+
 function draw(){const s=cur,hd=`<header class="top"><button class="sq" data-go="${back[s]}">←</button><h1>${TT[s]}</h1>${s==="col"||s==="safe"?'<b class="chip mny"></b>':s==="up"?'<b class="chip mny"></b><b class="chip dol"></b>':""}</header>`;
- $("v").innerHTML=hd+({menu,col:coll,safe:coll,up:ups,as:aus,cfg,cty,adm:admS,cat:catS,trade:tradeS,auction:auctionS,online:onlineS})[s]();
- if(s==="col"||s==="safe"){$("q").value=q;lstDraw()}if(s==="auction")apiAuctionList();if(s==="adm")admInit();hud()}
+ $("v").innerHTML=hd+({menu,col:coll,safe:coll,up:ups,as:aus,cfg,cty,adm:admS,tasks:tasksS,cat:catS,trade:tradeS,auction:auctionS,online:onlineS})[s]();
+ if(s==="col"||s==="safe"){$("q").value=q;lstDraw()}if(s==="auction")apiAuctionList();if(s==="adm")admInit();if(s==="tasks")apiTasks();hud()}
 function regList(){const f=regq.toLowerCase(),cn=S.cn,rows=cn==="ua"?UAR:cn==="ae"?Object.keys(EM).map(k=>[k,EM[k].n]):REG.map(c=>[c,nm(c)]);
  return [["","Все регионы"]].concat(rows).filter(([c,n])=>!c||!f||c.toLowerCase().startsWith(f)||n.toLowerCase().includes(f))
  .map(([c,n])=>`<div class="rg${S.reg===c?" on":""}" data-rg="${c}"><span><b>${n}</b>${c?`<em>${cn==="ae"?c.toUpperCase():c}</em>`:""}</span><span class="mt">${c?"×"+rm(c,cn).toFixed(2):""}</span></div>`).join("")}
@@ -470,9 +632,11 @@ document.addEventListener("click",e=>{
  if(a==="fl"){S.fr=((S.fr||0)+1)%5;save();return draw()}
  if(a==="agl"){const n=Math.max(1,Math.min(1e9,Math.floor(+$("al2").value)||1));return adGrant({kind:"luck",level:n})}
  if(a==="agm"){const m=+$("am").value||0,u=+$("ad").value||0;return adGrant({kind:"money",rubles:m,dollars:u})}
- if(a==="agp"){const ty=$("ty").value,n={civ:3,taxi:2,pol:1,mil:2}[ty],dn=ty==="pol"||ty==="mil"?4:3,L=$("pl").value.toUpperCase().replace(/[ABEKMHOPCTYX]/g,c=>LET["ABEKMHOPCTYX".indexOf(c)==0?0:"ABEKMHOPCTYX".indexOf(c)]).replace(/[^АВЕКМНОРСТУХ]/g,""),d=$("pd").value.replace(/\D/g,"").padStart(dn,"0"),r=$("pr").value.replace(/\D/g,"");
-  if(L.length!==n||d.length!==dn||r.length<2||r.length>3)return toast("Нужно букв: "+n+", цифр: "+dn+", регион 2–3 цифры");
-  {const b=mkV({cn:"ru",ty,L,d,reg:r,id:Date.now()+"_"+rnd(1e6),t0:Date.now()});return adGrant({kind:"plate",plate:{text:txt(b),country:"ru",region:b.reg,letters:b.L,digits:b.d,type:b.ty,rarity:b.r,value:b.v,details:b.t}})}}
+ if(a==="agp")return gpGrant();
+ if(a==="taskAdd")return apiTaskAdd();
+ if(a==="taskTog")return apiTaskAdm("tog",D.tid);
+ if(a==="taskDel")return apiTaskAdm("del",D.tid);
+ if(a==="taskClaim")return apiTaskClaim(D.tid);
  if(a==="more"){lim+=60;return lstDraw()}
  if(a==="all"){vis.length&&sel.size>=vis.length?sel.clear():vis.forEach(p=>sel.add(p.id));return lstDraw()}
  if(a==="sf"){if(!sel.size)return;S.inv.forEach(p=>{if(sel.has(p.id))p.sf=cur==="col"?1:0});sel.clear();save();return draw()}
@@ -483,6 +647,9 @@ document.addEventListener("click",e=>{
 });
 document.addEventListener("input",e=>{const i=e.target.id;
  if(i==="adm-q")return admList();
+ if(i==="gp-c"||i==="gp-t")return gpFields();
+ if(i==="tk-kind")return tkPar();
+ if(i&&/^gp-/.test(i))return gpPrev();
  if(i==="q"){q=e.target.value.replace(/ /g,"").toLowerCase();lim=60;lstDraw()}
  else if(i==="rq"){regq=e.target.value;$("rl").innerHTML=regList()}});
 (function snow(){const layer=$("snow");if(!layer)return;for(let i=0;i<32;i++){const f=document.createElement("span");f.className="snowflake";f.textContent=["❄","❅","❆"][i%3];f.style.left=(Math.random()*100)+"%";f.style.fontSize=(9+Math.random()*13)+"px";f.style.animationDuration=(8+Math.random()*13)+"s";f.style.animationDelay=(-Math.random()*18)+"s";f.style.setProperty("--drift",(Math.random()*100-50)+"px");layer.appendChild(f)}})();
@@ -503,7 +670,7 @@ let grantBusy=false;
 async function applyGrants(){if(grantBusy||!U||!LS.get("nomera_token"))return;grantBusy=true;try{const d=await apiReq("/api/grants");if(!d.grants.length)return;const done=[];let msg=[];for(const g of d.grants){const p=g.payload;
  if(g.kind==="luck"){S.luck=Math.max(0,p.level-1);msg.push("удача ×"+p.level)}
  else if(g.kind==="money"){S.m=Math.max(0,S.m+(p.rubles||0));S.usd=Math.max(0,S.usd+(p.dollars||0));msg.push("деньги")}
- else if(g.kind==="plate"){if(!S.inv.some(x=>x.sid===p.id))S.inv.unshift(mkV({cn:p.country||"ru",L:p.letters||"",d:p.digits||"",reg:p.region||"",ty:p.type||"civ",r:p.rarity||0,v:p.value||0,sid:p.id,id:"grant_"+p.id,t0:Date.now()}));msg.push("номер "+p.text)}
+ else if(g.kind==="plate"){if(!S.inv.some(x=>x.sid===p.id)){const q=mkV({cn:p.country||"ru",L:p.letters||"",d:p.digits||"",reg:p.region||"",ty:p.type||"civ",sid:p.id,id:"grant_"+p.id,t0:Date.now(),tx:CN[p.country||"ru"]?undefined:p.text,cname:p.countryName||undefined});if(p.value>0)q.v=p.value;q.r=tier(q);S.inv.unshift(q)}msg.push("номер "+p.text)}
  done.push(g.id)}
  save();hud();if(cur==="col"||cur==="ups")draw();await apiReq("/api/grants/ack",{ids:done});toast("Подарок от администратора: "+msg.join(", "))}catch(e){}finally{grantBusy=false}}
 async function checkSession(){if(!U||!LS.get("nomera_token"))return;try{await apiReq("/api/me")}catch(e){if(e.status===401){LS.set("nomera_token","");U="";LS.set("nomera_cur","");$("au").classList.add("on");toast("Сессия устарела — войди снова");return}}applyGrants()}
