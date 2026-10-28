@@ -180,7 +180,7 @@ const $=id=>document.getElementById(id),rnd=n=>Math.floor(Math.random()*n),rub=n
 const LS={get(k){try{return window.localStorage.getItem(k)}catch(e){return null}},set(k,v){try{window.localStorage.setItem(k,v)}catch(e){}}};
 const DEF=()=>({m:5000,usd:0,inv:[],luck:0,spd:0,au:0,as:0,reg:"",cn:"ru",v:2,ty:{civ:1,taxi:1,pol:1,mil:1},sort:"p",dir:-1,n:0,fr:0}),S=DEF();let U=LS.get("nomera_cur")||"";
 const rd=k=>{try{return JSON.parse(LS.get(k)||"{}")}catch(e){return{}}};
-function loadU(u){for(const k in S)delete S[k];const d=rd("nomera_d_"+u);if(d.v!==2){d.as=0;d.v=2}Object.assign(S,DEF(),d);S.inv.forEach(p=>{if(p.q!==2)mkV(p);p.r=tier(p)})}
+function loadU(u){for(const k in S)delete S[k];const d=rd("nomera_d_"+u);if(d.v!==2){d.as=0;d.v=2}Object.assign(S,DEF(),d);if(!cOpen(S.cn,u)){S.cn="ru";S.reg=""}S.inv.forEach(p=>{if(p.q!==2)mkV(p);p.r=tier(p)})}
 const save=()=>{if(U)LS.set("nomera_d_"+U,JSON.stringify(S))};
 async function hs(p,s){const t=s+p;try{return[...new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t)))].map(b=>b.toString(16).padStart(2,"0")).join("")}catch(e){let h=5381;for(const c of t)h=(h*33^c.charCodeAt(0))>>>0;return""+h}}
 async function auth(reg){const l=$("al").value.trim().toLowerCase(),p=$("ap").value,er=m=>$("ae").textContent=m;
@@ -204,7 +204,7 @@ const REGS=[...REG].sort((a,b)=>rm(b,"ru")-rm(a,"ru"));
 const TH=[0,5e3,3e4,3e5,2.5e6];
 // Foreign plates use their own, reachable rarity/value curve; RU, UA and Dubai keep the original economy.
 const FTH=[0,600,2500,12000,60000];
-const tier=p=>{const c=p.cn||"ru",a=(!["ru","ua","ae","ady"].includes(c)?FTH:TH);return a.reduce((r,t,i)=>p.v>=t*(CS[c]||1)?i:r,0)};
+const tier=p=>{const c=p.cn||"ru",a=(!["ru","ua","ae"].includes(c)?FTH:TH);return a.reduce((r,t,i)=>p.v>=t*(CS[c]||1)?i:r,0)};
 const nice=v=>{const k=Math.max(0,String(Math.round(v)).length-3);return Math.round(v/10**k)*10**k};
 const txt=p=>{const c=p.cn||"ru",L=p.L||"",d=p.d||"",r=p.reg||"";
  if(c==="ge")return `${L.split("-")[0]||"AB"}-${d||"123"}-${L.split("-")[1]||"CD"}`;
@@ -312,7 +312,7 @@ function mkV(p){
  p.v=Math.min(a.cap,nice(a.b*(.8+Math.random()*.5)*a.m*rm(p.reg,p.cn)));
  // Make epic/legendary foreign plates genuinely obtainable instead of relying only on expensive patterns.
  // Rarity is represented by a minimum value so it persists when inventory is reloaded.
- if(!["ru","ua","ae","ady"].includes(p.cn)){
+ if(!["ru","ua","ae"].includes(p.cn)){
    const roll=Math.random();let r=roll>.985?4:roll>.93?3:roll>.78?2:roll>.50?1:0;
    const floor=FTH[r];if(r>0)p.v=Math.min(a.cap,Math.max(p.v,floor));
    // More eye-catching combos get a modest premium on top of their rarity floor.
@@ -400,7 +400,8 @@ const aus=()=>`<p class="mut">Номера выбранной редкости �
 function cfg(){const e=Object.keys(S.ty).filter(k=>S.ty[k]),tot=e.reduce((s,k)=>s+TY[k][1],0);
  return `<button class="pick" data-go="cty"><u class="flag big ${CN[S.cn].f}"></u><b>${CN[S.cn].n}</b><small>${S.cn==="ru"?e.length+" / 4":""}</small></button><h3>Типы номеров</h3><div class="lst">`+(S.cn!=="ru"?`<div class="it">${plate(S.cn==="ge"?{cn:"ge",L:"AB-CD",d:"123"}:S.cn==="ua"?{cn:"ua",L:"АВ",d:"0777",reg:"АА"}:S.cn==="ae"?{cn:"ae",L:"A",d:"777",reg:"dxb"}:{...genCIS(S.cn,Math.random),cn:S.cn},1)}<div class="inf"><b>Гражданский</b><b class="mt">100%</b></div></div>`:Object.keys(TY).map(k=>{const p={ty:k,L:k==="civ"?"ААА":k==="pol"?"А":"АА",d:k==="civ"||k==="taxi"?"001":"0001",reg:"01"};
   return `<div class="it${S.ty[k]?"":" dim"}" data-ty="${k}">${plate(p,1)}<div class="inf"><b>${TY[k][0]}</b><b class="mt">${S.ty[k]?(TY[k][1]/tot*100).toFixed(1).replace(".",",")+"%":"выкл"}</b></div></div>`}).join(""))+`</div><div class="foot"><button class="pill" data-go="cty">Выбрать страну</button><button class="pill" data-a="reg">${S.reg?(S.cn==="ae"?"":S.reg+" · ")+nm(S.reg):"Все регионы"} ▴</button></div>`}
-const cty=()=>`<div class="lst country-list">${Object.keys(CN).map(k=>`<button class="pick${S.cn===k?" act":""}" data-cn="${k}"><u class="flag big ${CN[k].f||k}"></u><b>${CN[k].n}</b><small>${S.cn===k?"✓":""}</small></button>`).join("")}</div>`;
+const CLOCK=1000,cOpen=(k,u=U)=>k==="ru"||k==="ua"||u==="admin"||(S.n||0)>=CLOCK;
+const cty=()=>`${cOpen("ae")?"":`<p class="mut">Остальные страны откроются после ${CLOCK} бросков. Сейчас: ${Math.min(S.n||0,CLOCK)} / ${CLOCK}</p>`}<div class="lst country-list">${Object.keys(CN).map(k=>`<button class="pick${S.cn===k?" act":""}${cOpen(k)?"":" locked"}" ${cOpen(k)?"":'style="opacity:.45"'} data-cn="${k}"><u class="flag big ${CN[k].f||k}"></u><b>${CN[k].n}</b><small>${S.cn===k?"✓":cOpen(k)?"":"🔒"}</small></button>`).join("")}</div>`;
 const catS=()=>`<div class="lst"><p class="mut">Редкость определяется реальной рыночной стоимостью номера. Для ОАЭ пороги в 8 раз выше — цены там намного больше.</p>`+RL.map((x,i)=>`<div class="card"><div><b style="color:${x[1]}">${x[0]}</b><p class="mut">от ${rub(TH[i])}</p></div><span class="bar">${dash(i)}</span></div>`).join("")+"</div>";
 const admS=()=>`<div class="lst"><h3>Сервер</h3><p class="mut">Адрес сервера игры (его видишь только ты):</p><input id="adm-api" placeholder="https://api.example.com" autocapitalize="none" autocorrect="off" spellcheck="false" value="${(()=>{try{return localStorage.getItem("nomera_api_base")||DEFAULT_API||""}catch(e){return DEFAULT_API||""}})()}"><div class="row"><button class="pill" data-a="apiSave">Сохранить</button><button class="pill" data-a="apiCheck">Проверить</button></div><p id="adm-api-st" class="mut"></p>
 <h3>Статистика</h3><button class="pill" data-a="adminStats">Обновить статистику</button><div id="admin-stats" class="lst"><p class="mut">Нажми «Обновить статистику».</p></div>
@@ -429,7 +430,7 @@ document.addEventListener("click",e=>{
   if(D.acceptTrade)return apiAcceptTrade(D.acceptTrade);
   if(D.buyAuction)return apiBuyAuction(D.buyAuction);
   if(D.copyPlate){$("ex-theirs").value=D.copyPlate;return toast("Номер выбран")}
- if(D.cn){S.cn=D.cn;S.reg="";save();return go("cfg")}
+ if(D.cn){if(!cOpen(D.cn))return toast("🔒 Откроется после "+CLOCK+" бросков ("+Math.min(S.n||0,CLOCK)+"/"+CLOCK+")");S.cn=D.cn;S.reg="";save();return go("cfg")}
  if(D.go)return go(D.go);
  if(D.so){if(S.sort===D.so)S.dir*=-1;else{S.sort=D.so;S.dir=D.so==="a"?1:-1}save();return draw()}
  if(D.id){sel.has(D.id)?sel.delete(D.id):sel.add(D.id);t.classList.toggle("sel");return foot()}
@@ -469,9 +470,14 @@ document.addEventListener("input",e=>{const i=e.target.id;
  else if(i==="rq"){regq=e.target.value;$("rl").innerHTML=regList()}});
 (function snow(){const layer=$("snow");if(!layer)return;for(let i=0;i<32;i++){const f=document.createElement("span");f.className="snowflake";f.textContent=["❄","❅","❆"][i%3];f.style.left=(Math.random()*100)+"%";f.style.fontSize=(9+Math.random()*13)+"px";f.style.animationDuration=(8+Math.random()*13)+"s";f.style.animationDelay=(-Math.random()*18)+"s";f.style.setProperty("--drift",(Math.random()*100-50)+"px");layer.appendChild(f)}})();
 const apiParam=new URLSearchParams(location.search).get("api");if(apiParam&&/^https?:\/\//i.test(apiParam)){try{localStorage.setItem("nomera_api_base",apiParam.replace(/\/$/,""))}catch(e){}}
-const DEFAULT_API="";/* впиши сюда адрес своего сервера, например "https://api.example.com" — тогда игрокам вводить его не придётся */
+const DEFAULT_API="https://nomera-1tbh.onrender.com";/* впиши сюда адрес своего сервера, например "https://api.example.com" — тогда игрокам вводить его не придётся */
 function apiBase(){try{const saved=localStorage.getItem("nomera_api_base");if(saved)return saved.replace(/\/$/,"")}catch(e){}if(DEFAULT_API)return DEFAULT_API.replace(/\/$/,"");return location.protocol==="http:"||location.protocol==="https:"?location.origin:""}
-async function apiReq(path,body){const token=LS.get("nomera_token")||"";const base=apiBase();if(!base)throw Error("Для онлайн-режима укажи адрес сервера: добавь ?api=https://адрес-твоего-сервера к ссылке приложения");const r=await fetch(base+path,{method:body?"POST":"GET",headers:{"Content-Type":"application/json",...(token?{Authorization:"Bearer "+token}:{})},...(body?{body:JSON.stringify(body)}:{})});const d=await r.json().catch(()=>({error:"Сервер игры не настроен на сайте. Используется локальный режим."}));if(!r.ok){const er=Error(d.error||"Ошибка сервера");er.status=r.status;throw er}return d}
+let wakeP=null;
+function wakeServer(base){if(wakeP)return wakeP;toast("Сервер просыпается, подожди до минуты…");wakeP=(async()=>{for(let i=0;i<14;i++){try{const r=await fetch(base+"/api/health",{cache:"no-store"});if(r.ok)return true}catch(e){}await new Promise(r=>setTimeout(r,5000))}return false})().finally(()=>{wakeP=null});return wakeP}
+async function apiReq(path,body){const token=LS.get("nomera_token")||"";const base=apiBase();if(!base)throw Error("Для онлайн-режима укажи адрес сервера: добавь ?api=https://адрес-твоего-сервера к ссылке приложения");
+ const go1=()=>fetch(base+path,{method:body?"POST":"GET",headers:{"Content-Type":"application/json",...(token?{Authorization:"Bearer "+token}:{})},...(body?{body:JSON.stringify(body)}:{})});
+ let r;try{r=await go1()}catch(e){if(!(await wakeServer(base)))throw Error("Сервер недоступен: проверь адрес сервера или повтори через минуту");r=await go1()}
+ const d=await r.json().catch(()=>({error:"Сервер игры не настроен на сайте. Используется локальный режим."}));if(!r.ok){const er=Error(d.error||"Ошибка сервера");er.status=r.status;throw er}return d}
 const esc=x=>String(x).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const ago=ts=>{if(!ts)return"никогда";const m=Math.floor((Date.now()-ts)/60000);return m<1?"только что":m<60?m+" мин назад":m<1440?Math.floor(m/60)+" ч назад":Math.floor(m/1440)+" дн назад"};
 async function apiAdminUsers(){const el=$("admin-users");try{const d=await apiReq("/api/admin/users");if(el)el.innerHTML=d.users.map(x=>`<div class="card"><div><b>${esc(x.login)}</b> <small>${x.online?"● онлайн":"не в сети · "+ago(x.last_seen)}</small><p class="mut">${rub(x.rubles)} · ${x.dollars} $ · удача ×${x.luck+1} · бросков: ${x.rolls}</p><p class="mut">Номеров: ${x.plates} (эпик+: ${x.rare}) · лучший: ${rub(x.best)} · создан: ${esc(x.created_at)}</p></div><button class="pill" data-pick-user="${esc(x.login)}">Выбрать</button></div>`).join("")||"Аккаунтов пока нет"}catch(e){if(el)el.textContent=e.message;toast(e.message)}}
