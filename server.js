@@ -108,7 +108,8 @@ function trackTasks(userId,{rarity,country}){
 }
 app.use((req,res,next)=>{res.setHeader('Access-Control-Allow-Origin','*');res.setHeader('Access-Control-Allow-Headers','Content-Type, Authorization');res.setHeader('Access-Control-Allow-Methods','GET, POST, OPTIONS');if(req.method==='OPTIONS')return res.sendStatus(204);next()});
 app.use(express.json({limit:'32kb'}));
-app.use(express.static(__dirname));
+// Раздаём только страницу игры: раньше express.static(__dirname) отдавал наружу nomera.sqlite и server.js
+app.get(['/','/index.html'],(req,res)=>res.sendFile(path.join(__dirname,'index.html')));
 function fail(res, status, error) { return res.status(status).json({error}); }
 function auth(req,res,next) {
  const token = (req.headers.authorization || '').replace(/^Bearer\s+/i,'');
@@ -345,7 +346,13 @@ app.post('/api/auctions',auth,(req,res)=>{
  if(!plate||!Number.isSafeInteger(price)||price<1||price>2000000000)return fail(res,400,'Цена должна быть целым числом от 1 до 2 000 000 000 ₽');
  const p=db.prepare('SELECT id,owner_id FROM plates WHERE owner_id=? AND (id=? OR plate_text=? COLLATE NOCASE) LIMIT 1').get(req.user.id,plate,plate);
  if(!p)return fail(res,404,'Этот номер не найден в твоей серверной коллекции');
+ db.prepare("DELETE FROM auctions WHERE plate_id=? AND status!='active'").run(p.id);
  try{db.prepare("INSERT INTO auctions(plate_id,seller_id,price) VALUES(?,?,?)").run(p.id,req.user.id,price);res.json({ok:true})}catch(e){if(String(e).includes('UNIQUE'))return fail(res,409,'Этот номер уже выставлен на аукцион');console.error(e);return fail(res,500,'Не удалось выставить номер')}
+});
+app.post('/api/auctions/:id/cancel',auth,(req,res)=>{
+ const r=db.prepare("DELETE FROM auctions WHERE id=? AND seller_id=? AND status='active'").run(Number(req.params.id),req.user.id);
+ if(!r.changes)return fail(res,404,'Лот не найден, уже продан или он не твой');
+ res.json({ok:true});
 });
 app.post('/api/auctions/:id/buy',auth,(req,res)=>{
  try{const result=db.transaction(()=>{

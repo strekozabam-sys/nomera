@@ -44,6 +44,12 @@ footer{display:flex;gap:12px;justify-content:center;padding:6px 0 10px}footer .p
 .tile>span{min-height:42px;display:flex;align-items:center;line-height:1.15;overflow-wrap:anywhere}
 
 small{color:var(--mt);font-weight:600}
+.clkw{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;position:relative}
+.clkb{width:min(68vw,270px);aspect-ratio:1;border-radius:50%;border:0;font-size:min(30vw,120px);font-weight:900;color:#7a5200;background:radial-gradient(circle at 35% 30%,#fff3b0,#f7c83a 45%,#c98f10);box-shadow:inset 0 -10px 24px #0004,inset 0 8px 16px #fff6,0 14px 40px #f7c83a55;touch-action:manipulation;transition:transform .06s;position:relative;display:flex;align-items:center;justify-content:center}
+.clkb:active{transform:scale(.93)}
+.clkc{color:var(--mt);font-weight:700;text-align:center;line-height:1.5}
+.clkf{position:absolute;pointer-events:none;font-weight:800;color:#facc15;font-size:22px;text-shadow:0 2px 6px #000a;animation:clkf .8s ease-out forwards;z-index:3}
+@keyframes clkf{to{transform:translateY(-90px);opacity:0}}
 .plate{position:relative;container-type:inline-size;display:grid;grid-template-columns:75.5% 24.5%;aspect-ratio:4.6/1;width:100%;border-radius:10px;border:3px solid #565760;background:linear-gradient(115deg,#b7b7bc,#fafafd 34%,#d0d0d4 68%,#b0b0b6);box-shadow:inset 0 0 0 2px #ededf0,0 18px 38px #0009;overflow:hidden}
 .plate.taxi{background:linear-gradient(115deg,#d8a800,#ffd60a 42%,#e8b900)}
 .plate.pol{background:linear-gradient(115deg,#1b45b8,#3f86f7 40%,#1a46b5);border-color:#0d2a78}.plate.mil{background:linear-gradient(115deg,#18181b,#3a3b42 40%,#17171a);border-color:#050507}
@@ -379,7 +385,7 @@ async function rollImpl(){const N=S.luck+1;let b=null;
  if(b.r<S.as||S.inv.length>=1000){S.m+=b.v;note="Продан: +"+rub(b.v)}
  else{S.inv.push(b);const d=[0,0,1,5,25][b.r];S.usd+=d;note="В коллекции"+(d?" · +"+d+" $":"")}
  show(b,note);hud();save();return b}
-function hud(){document.querySelectorAll(".mny").forEach(e=>e.textContent=rub(S.m));document.querySelectorAll(".dol").forEach(e=>e.textContent=S.usd+" $");
+function hud(){document.querySelectorAll(".mny").forEach(e=>e.textContent=rub(S.m));document.querySelectorAll(".dol").forEach(e=>e.textContent=usd(S.usd)+" $");
  const k=Object.keys(S.ty).filter(x=>S.ty[x]).length;$("cfgb").innerHTML=`<u class="flag ${CN[S.cn].f}"></u> ${CN[S.cn].n.replace(" (Дубай)","")} <small>${S.cn==="ru"?k+" "+(k===1?"тип":k<5?"типа":"типов"):""}</small>`;
  $("auto").textContent=SP[S.au]?"Авто "+SP[S.au]+"/с":"Авто выкл";$("auto").classList.toggle("on",!!S.au)}
 let tm;function setAuto(){clearInterval(tm);if(SP[S.au])tm=setInterval(roll,1000/SP[S.au]);hud()}
@@ -388,8 +394,8 @@ $("auto").onclick=()=>{if(!S.spd)return toast("Авто открывается �
 
 // экраны
 let cur="gen",sel=new Set(),lim=60,q="",regq="",vis=[];
-const back={menu:"gen",col:"menu",safe:"menu",up:"menu",as:"menu",cfg:"gen",cty:"cfg",adm:"menu",tasks:"menu",cat:"menu",trade:"menu",auction:"menu",online:"menu"};
-const TT={menu:"Меню",col:"Коллекция",safe:"Сейф",up:"Улучшения",as:"Автопродажа",cfg:"Настройка генерации",cty:"Страна",adm:"Админ-панель",tasks:"Ежедневные задания",cat:"Каталог редкостей",trade:"Трейд номеров",auction:"Аукцион номеров",online:"Игроки онлайн"};
+const back={menu:"gen",col:"menu",safe:"menu",up:"menu",as:"menu",cfg:"gen",cty:"cfg",adm:"menu",tasks:"menu",cat:"menu",trade:"menu",auction:"menu",online:"menu",clicker:"menu"};
+const TT={menu:"Меню",col:"Коллекция",safe:"Сейф",up:"Улучшения",as:"Автопродажа",cfg:"Настройка генерации",cty:"Страна",adm:"Админ-панель",tasks:"Ежедневные задания",cat:"Каталог редкостей",trade:"Трейд номеров",auction:"Аукцион номеров",online:"Игроки онлайн",clicker:"Кликер"};
 function go(s){cur=s;sel.clear();lim=60;q="";$("gen").classList.toggle("on",s==="gen");$("v").classList.toggle("on",s!=="gen");if(s!=="gen")draw()}
 const T=(g,c,a,n,x="")=>`<button class="tile ${c}" ${g==="out"?'data-a="out"':g?`data-go="${g}"`:'data-a="soon"'}>${x}<div class="art">${a}</div><span>${n}</span></button>`;
 /* ---------- иконки меню (SVG) ---------- */
@@ -438,6 +444,8 @@ const ICO={
 const gem=(c,w,h)=>`<svg viewBox="0 0 40 48" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg"><polygon points="20,2 38,15 20,46 2,15" fill="${c}"/><polygon points="20,2 38,15 20,15" fill="#fff" opacity=".4"/><polygon points="20,2 2,15 20,15" fill="#fff" opacity=".18"/><polygon points="2,15 20,15 20,46" fill="#000" opacity=".2"/><polygon points="38,15 20,15 20,46" fill="#000" opacity=".06"/><polygon points="20,2 38,15 2,15" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1"/></svg>`;
 const cnI=(c,p)=>CN[c]||{n:(p&&p.cname)||String(c).toUpperCase(),f:c};
 const stk=a=>`<div class="stk">${a.map((p,i)=>`<div style="top:${i*28}%;left:${i*8}%;z-index:${i}">${plate({cn:"ru",ty:"civ",...p},1)}</div>`).join("")}</div>`;
+ICO.clk=I("",`<defs>${lg("k1","#fff3b0","#c98f10")}</defs><circle cx="48" cy="48" r="38" fill="url(#k1)"/><circle cx="48" cy="48" r="38" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="2"/><text x="48" y="62" text-anchor="middle" font-size="42" font-weight="900" fill="#7a5200" font-family="system-ui,sans-serif">$</text>`);
+const usd=v=>String(+(+v).toFixed(3));
 const menu=()=>`<div class="tiles">`+[
  T("gen","big",plate({ty:"civ",L:"ААА",d:"777",reg:"777"}),"Генератор"),
  T("tasks","w",ICO.tasks,"Ежедневные задания"),
@@ -450,6 +458,7 @@ const menu=()=>`<div class="tiles">`+[
  T("","",plate({ty:"civ",L:"ААА",d:"717",reg:"77"},1)+ICO.bag,"Скупка номеров"),
  T("auction","gold",ICO.auc,"Аукцион номеров"),
  T("cat","pu",`<div class="gems2">${RL.map((x,i)=>`<span style="filter:drop-shadow(0 0 8px ${x[1]}aa)">${gem(x[1],20+i*4,26+i*5)}</span>`).join("")}</div>`,"Каталог редкостей"),
+ T("clicker","gr",ICO.clk,"Кликер"),
  ...(U==="admin"?[T("adm","w sm",ICO.adm,"Админ-панель")]:[]),
  T("out","w sm",ICO.out,"Выйти ("+U+")")].join("")+"</div>";
 function coll(){const sf=cur==="safe",L=S.inv.filter(p=>!!p.sf===sf);
@@ -595,9 +604,17 @@ async function apiTasks(){const el=$("tk-list");
  catch(e){if(el)el.innerHTML=`<p class="mut">${esc(e.message)}</p>`}}
 async function apiTaskClaim(id){try{const d=await apiReq("/api/tasks/"+id+"/claim",{});S.m+=d.rubles||0;S.usd+=d.dollars||0;save();hud();toast("Награда: "+tkRw({reward_rub:d.rubles,reward_usd:d.dollars}));apiTasks()}catch(e){toast(e.message);apiTasks()}}
 
-function draw(){const s=cur,hd=`<header class="top"><button class="sq" data-go="${back[s]}">←</button><h1>${TT[s]}</h1>${s==="col"||s==="safe"?'<b class="chip mny"></b>':s==="up"?'<b class="chip mny"></b><b class="chip dol"></b>':""}</header>`;
- $("v").innerHTML=hd+({menu,col:coll,safe:coll,up:ups,as:aus,cfg,cty,adm:admS,tasks:tasksS,cat:catS,trade:tradeS,auction:auctionS,online:onlineS})[s]();
+function draw(){const s=cur,hd=`<header class="top"><button class="sq" data-go="${back[s]}">←</button><h1>${TT[s]}</h1>${s==="col"||s==="safe"?'<b class="chip mny"></b>':s==="up"||s==="clicker"?'<b class="chip mny"></b><b class="chip dol"></b>':""}</header>`;
+ $("v").innerHTML=hd+({menu,col:coll,safe:coll,up:ups,as:aus,cfg,cty,adm:admS,tasks:tasksS,cat:catS,trade:tradeS,auction:auctionS,online:onlineS,clicker:clkS})[s]();
  if(s==="col"||s==="safe"){$("q").value=q;lstDraw()}if(s==="auction")apiAuctionList();if(s==="adm")admInit();if(s==="tasks")apiTasks();hud()}
+const clkS=()=>`<div class="clkw"><div class="clkc">Каждый клик: +0.001 $</div><button class="clkb" data-a="clk">$</button><div class="clkc" id="clkn">Кликов: ${S.clk||0}</div></div>`;
+let clkT;
+function clkTap(t,e){S.usd=Math.round((S.usd+0.001)*1000)/1000;S.clk=(S.clk||0)+1;
+ document.querySelectorAll(".dol").forEach(x=>x.textContent=usd(S.usd)+" $");const n=$("clkn");if(n)n.textContent="Кликов: "+S.clk;
+ const w=t.parentNode,r=w.getBoundingClientRect(),f=document.createElement("span");f.className="clkf";f.textContent="+0.001 $";
+ f.style.left=Math.max(10,Math.min(r.width-90,(e.clientX||r.left+r.width/2)-r.left-40))+"px";f.style.top=Math.max(0,(e.clientY||r.top+r.height/2)-r.top-30)+"px";w.appendChild(f);setTimeout(()=>f.remove(),800);
+ if(navigator.vibrate)navigator.vibrate(8);clearTimeout(clkT);clkT=setTimeout(save,500)}
+addEventListener("pagehide",()=>{clearTimeout(clkT);save()});
 function regList(){const f=regq.toLowerCase(),cn=S.cn,rows=cn==="ua"?UAR:cn==="ae"?Object.keys(EM).map(k=>[k,EM[k].n]):REG.map(c=>[c,nm(c)]);
  return [["","Все регионы"]].concat(rows).filter(([c,n])=>!c||!f||c.toLowerCase().startsWith(f)||n.toLowerCase().includes(f))
  .map(([c,n])=>`<div class="rg${S.reg===c?" on":""}" data-rg="${c}"><span><b>${n}</b>${c?`<em>${cn==="ae"?c.toUpperCase():c}</em>`:""}</span><span class="mt">${c?"×"+rm(c,cn).toFixed(2):""}</span></div>`).join("")}
@@ -625,7 +642,9 @@ document.addEventListener("click",e=>{
  if(a==="apiSave"){const v=$("adm-api").value.trim().replace(/\/+$/,"");if(v&&!/^https?:\/\//i.test(v))return toast("Адрес должен начинаться с http:// или https://");try{if(v)localStorage.setItem("nomera_api_base",v);else localStorage.removeItem("nomera_api_base")}catch(e){}return toast("Адрес сервера сохранён")}
  if(a==="apiCheck"){const v=$("adm-api").value.trim().replace(/\/+$/,""),st=$("adm-api-st");st.textContent="Проверяю…";return fetch((v||apiBase())+"/api/health").then(r=>r.json()).then(d=>{st.textContent=d.ok?"✅ Сервер отвечает":"⚠️ Странный ответ"}).catch(()=>{st.textContent="❌ Сервер недоступен"})}
  if(a==="transfer")return apiTransfer();
- if(a==="auctionList")return apiCreateAuction();
+ if(a==="clk")return clkTap(t,e);
+  if(a==="auctionCancel")return apiCancelAuction(D.aid);
+  if(a==="auctionList")return apiCreateAuction();
  if(a==="auctionRefresh")return apiAuctionList();
  if(a==="tradeOffer")return apiTrade();
  if(a==="tradeInbox")return apiTradeInbox();
@@ -679,8 +698,9 @@ setInterval(applyGrants,30000);
 async function apiOnline(){try{const d=await apiReq("/api/players");const el=$("online-list");if(el)el.innerHTML=d.players.map(x=>`<div class="card"><b>${x.login}</b><small>${x.online?"● онлайн":"не в сети"}</small></div>`).join("")||'<p class="mut">Пока никого нет.</p>'}catch(e){toast("Сервер не подключён: "+e.message)}}
 async function apiTransfer(){try{const id=$("tr-id").value.trim();await apiReq("/api/transfer",{to:$("tr-to").value,plateId:id});S.inv=S.inv.filter(p=>p.sid!==id&&txt(p).toUpperCase()!==id.toUpperCase());save();if(cur==="col")draw();toast("Номер передан")}catch(e){toast(e.message)}}
 async function apiCreateAuction(){try{const plate=$("auc-plate").value.trim(),price=Number($("auc-price").value);if(!plate||!Number.isSafeInteger(price)||price<1)return toast("Укажи номер и целую цену больше нуля");await apiReq("/api/auctions",{plate,price});toast("Номер выставлен на аукцион");$("auc-plate").value="";$("auc-price").value="";apiAuctionList()}catch(e){toast(e.message)}}
-async function apiAuctionList(){try{const d=await apiReq("/api/auctions"),el=$("auction-list"),mine=$("auction-mine");if(el)el.innerHTML=d.auctions.filter(x=>!x.mine).map(x=>`<div class="card"><div><b>${x.text}</b><p class="mut">${x.seller} · редкость ${x.rarity+1}/5</p><b>${rub(x.price)}</b></div><button class="pill" data-buy-auction="${x.id}">Купить</button></div>`).join("")||'<p class="mut">Сейчас нет чужих лотов.</p>';if(mine)mine.innerHTML=d.auctions.filter(x=>x.mine).map(x=>`<div class="card"><div><b>${x.text}</b><p class="mut">Твоя цена: ${rub(x.price)}</p></div><span class="mut">На продаже</span></div>`).join("")||'<p class="mut">Ты пока ничего не выставил.</p>'}catch(e){const el=$("auction-list");if(el)el.innerHTML=`<p class="mut">${e.message}</p>`}}
-async function apiBuyAuction(id){try{const d=await apiReq("/api/auctions/"+id+"/buy",{});toast("Куплено: "+d.text);if(d.plate&&!S.inv.some(p=>p.sid===d.plate.id)){S.inv.unshift(mkV({cn:d.plate.country||"ru",L:d.plate.letters||"",d:d.plate.digits||"",reg:d.plate.region||"",ty:d.plate.type||"civ",r:d.plate.rarity||0,v:d.plate.value||d.price,sid:d.plate.id,id:"auc_"+d.plate.id,t0:Date.now()}));}apiAuctionList();try{const me=await apiReq("/api/me");if(me.user){S.m=me.user.rubles;save();hud()}}catch{}}catch(e){toast(e.message)}}
+async function apiAuctionList(){try{const d=await apiReq("/api/auctions"),el=$("auction-list"),mine=$("auction-mine");if(el)el.innerHTML=d.auctions.filter(x=>!x.mine).map(x=>`<div class="card"><div><b>${x.text}</b><p class="mut">${x.seller} · редкость ${x.rarity+1}/5</p><b>${rub(x.price)}</b></div><button class="pill" data-buy-auction="${x.id}">Купить</button></div>`).join("")||'<p class="mut">Сейчас нет чужих лотов.</p>';if(mine)mine.innerHTML=d.auctions.filter(x=>x.mine).map(x=>`<div class="card"><div><b>${x.text}</b><p class="mut">Твоя цена: ${rub(x.price)}</p></div><button class="pill" data-a="auctionCancel" data-aid="${x.id}">Снять</button></div>`).join("")||'<p class="mut">Ты пока ничего не выставил.</p>'}catch(e){const el=$("auction-list");if(el)el.innerHTML=`<p class="mut">${e.message}</p>`}}
+async function apiCancelAuction(id){try{await apiReq("/api/auctions/"+id+"/cancel",{});toast("Лот снят с продажи");apiAuctionList()}catch(e){toast(e.message)}}
+async function apiBuyAuction(id){try{const d=await apiReq("/api/auctions/"+id+"/buy",{});toast("Куплено: "+d.text);if(d.plate&&!S.inv.some(p=>p.sid===d.plate.id)){S.inv.unshift(mkV({cn:d.plate.country||"ru",L:d.plate.letters||"",d:d.plate.digits||"",reg:d.plate.region||"",ty:d.plate.type||"civ",r:d.plate.rarity||0,v:d.plate.value||d.price,sid:d.plate.id,id:"auc_"+d.plate.id,t0:Date.now()}));}apiAuctionList();S.m=Math.max(0,S.m-(d.price||0));save();hud();}catch(e){toast(e.message)}}
 async function apiTrade(){try{await apiReq("/api/trades",{to:$("ex-to").value,myPlateId:$("ex-mine").value,theirPlateId:$("ex-theirs").value,cash:Number($("ex-cash").value||0),usd:Number($("ex-usd").value||0)});toast("Предложение отправлено")}catch(e){toast(e.message)}}
 async function apiLookupPlates(){try{const login=encodeURIComponent($("ex-to").value.trim());const d=await apiReq("/api/players/"+login+"/plates");const el=$("other-plates");if(el)el.innerHTML=d.plates.map(p=>`<button class="card" data-copy-plate="${p.text}"><div><b>${p.text}</b><p class="mut">Номер: ${p.text}</p></div><span class="mut">Нажми, чтобы выбрать</span></button>`).join("")||'<p class="mut">У игрока пока нет номеров.</p>'}catch(e){toast(e.message)}}
 async function apiTradeInbox(){try{const d=await apiReq("/api/trades");const el=$("trade-inbox");if(el)el.innerHTML=d.offers.map(o=>`<div class="card"><div><b>${o.from_login}: ${o.from_plate} ⇄ ${o.to_plate}</b><p class="mut">Доплата: ${o.cash} ₽ · ${o.dollars} $</p></div><button class="pill" data-accept-trade="${o.id}">Принять</button></div>`).join("")||'<p class="mut">Нет входящих предложений.</p>'}catch(e){toast(e.message)}}
