@@ -5,7 +5,10 @@ const Database = require('better-sqlite3');
 const crypto = require('crypto');
 const path = require('path');
 const app = express();
-const db = new Database(path.join(__dirname, 'nomera.sqlite'));
+const DB_FILE = process.env.DB_PATH || path.join(__dirname, 'nomera.sqlite');
+try { require('fs').mkdirSync(path.dirname(DB_FILE), { recursive: true }); } catch (e) {}
+if (!process.env.DB_PATH && process.env.RENDER) console.warn('ВНИМАНИЕ: DB_PATH не задан. На Render файловая система стирается при каждом перезапуске — аккаунты будут пропадать. Подключи Disk и задай DB_PATH=/var/data/nomera.sqlite');
+const db = new Database(DB_FILE);
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 db.exec(`
@@ -132,7 +135,8 @@ app.post('/api/register', async (req,res)=>{
 app.post('/api/login', async (req,res)=>{
  const login=String(req.body.login||'').trim().toLowerCase(), password=String(req.body.password||'');
  const user=db.prepare('SELECT * FROM users WHERE login=? COLLATE NOCASE').get(login);
- if(!user || !(await bcrypt.compare(password,user.password_hash))) return fail(res,401,'Неверный логин или пароль');
+ if(!user) return fail(res,404,'Такого аккаунта нет. Если сервер недавно перезапускался, данные могли сброситься — нажми «Регистрация».');
+ if(!(await bcrypt.compare(password,user.password_hash))) return fail(res,401,'Неверный пароль');
  db.prepare('UPDATE users SET last_seen=? WHERE id=?').run(Date.now(),user.id);
  res.json({token:issue(user),user:{id:user.id,login:user.login,rubles:user.rubles,dollars:user.dollars}});
 });
@@ -338,7 +342,7 @@ app.post('/api/trades/:id/accept',auth,(req,res)=>{
 });
 
 app.get('/api/auctions',auth,(req,res)=>{
- const auctions=db.prepare(`SELECT a.id,a.price,a.created_at,p.plate_text AS text,p.country,p.rarity,p.value,p.id AS plate_id,u.login AS seller,a.seller_id=? AS mine FROM auctions a JOIN plates p ON p.id=a.plate_id JOIN users u ON u.id=a.seller_id WHERE a.status='active' ORDER BY a.created_at DESC LIMIT 100`).all(req.user.id).map(x=>({...x,mine:!!x.mine}));
+ const auctions=db.prepare(`SELECT a.id,a.price,a.created_at,p.plate_text AS text,p.country,p.rarity,p.value,p.image,p.id AS plate_id,u.login AS seller,a.seller_id=? AS mine FROM auctions a JOIN plates p ON p.id=a.plate_id JOIN users u ON u.id=a.seller_id WHERE a.status='active' ORDER BY a.created_at DESC LIMIT 100`).all(req.user.id).map(x=>({...x,mine:!!x.mine}));
  res.json({auctions});
 });
 app.post('/api/auctions',auth,(req,res)=>{
@@ -359,11 +363,11 @@ app.post('/api/auctions/:id/buy',auth,(req,res)=>{
   const a=db.prepare("SELECT * FROM auctions WHERE id=? AND status='active'").get(Number(req.params.id));
   if(!a)throw Error('Лот уже продан или снят');if(a.seller_id===req.user.id)throw Error('Нельзя купить собственный номер');
   const buyer=db.prepare('SELECT rubles FROM users WHERE id=?').get(req.user.id);if(!buyer||buyer.rubles<a.price)throw Error('Не хватает серверных рублей');
-  const plate=db.prepare('SELECT id,owner_id,plate_text,country,region,letters,digits,plate_type,rarity,value FROM plates WHERE id=?').get(a.plate_id);if(!plate||plate.owner_id!==a.seller_id)throw Error('Владелец номера изменился');
+  const plate=db.prepare('SELECT id,owner_id,plate_text,country,region,letters,digits,plate_type,rarity,value,image FROM plates WHERE id=?').get(a.plate_id);if(!plate||plate.owner_id!==a.seller_id)throw Error('Владелец номера изменился');
   db.prepare('UPDATE users SET rubles=rubles-? WHERE id=?').run(a.price,req.user.id);
   db.prepare('UPDATE users SET rubles=rubles+? WHERE id=?').run(a.price,a.seller_id);
   db.prepare('UPDATE plates SET owner_id=? WHERE id=?').run(req.user.id,plate.id);
-  db.prepare("UPDATE auctions SET status='sold' WHERE id=?").run(a.id);return {text:plate.plate_text,price:a.price,plate:{id:plate.id,country:plate.country,region:plate.region,letters:plate.letters,digits:plate.digits,type:plate.plate_type,rarity:plate.rarity,value:plate.value}};
+  db.prepare("UPDATE auctions SET status='sold' WHERE id=?").run(a.id);return {text:plate.plate_text,price:a.price,plate:{id:plate.id,country:plate.country,region:plate.region,letters:plate.letters,digits:plate.digits,type:plate.plate_type,rarity:plate.rarity,value:plate.value,image:plate.image||''}};
  })();res.json({ok:true,...result})}catch(e){return fail(res,400,e.message||'Покупка не удалась')}
 });
 
@@ -383,6 +387,7 @@ CREATE TABLE IF NOT EXISTS shop_items (
 );
 CREATE INDEX IF NOT EXISTS shop_status_idx ON shop_items(status);
 `);
+try{db.exec("ALTER TABLE plates ADD COLUMN image TEXT NOT NULL DEFAULT ''")}catch(e){}
 const SHOP_COUNTRIES=['ru','ua','ae','am','ge','kz','az','uz','kg','tj','tr','us','ng','af','pt','ady'];
 const isAdminUser=u=>u.login.toLowerCase()===String(process.env.ADMIN_LOGIN||'admin').toLowerCase();
 const shopRarity=v=>[0,5e3,3e4,3e5,2.5e6].reduce((r,t,i)=>v>=t?i:r,0);
@@ -391,14 +396,12 @@ app.get('/api/shop',auth,(req,res)=>{
  res.json({items,admin:isAdminUser(req.user)});
 });
 app.post('/api/admin/shop',auth,adminOnly,(req,res)=>{
- const b=req.body||{},text=String(b.text||'').trim().toUpperCase(),country=String(b.country||'ru'),region=String(b.region||'').trim().slice(0,8);
+ const b=req.body||{},title=String(b.title||'').trim().slice(0,40)||'Рамка';
  const price=Math.round(Number(b.price)*1000)/1000,value=Math.max(0,Math.min(2000000000,Math.round(Number(b.value)||0))),image=String(b.image||'');
- if(!text||text.length>40)return fail(res,400,'Укажи номер (до 40 символов)');
- if(!SHOP_COUNTRIES.includes(country))return fail(res,400,'Неизвестная страна');
  if(!(price>0)||price>1e9)return fail(res,400,'Цена в $ должна быть больше нуля');
- if(image&&(image.length>150000||!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(image)))return fail(res,400,'Картинка некорректная или слишком большая');
- if(db.prepare('SELECT 1 FROM plates WHERE country=? AND plate_text=?').get(country,text)||db.prepare("SELECT 1 FROM shop_items WHERE country=? AND plate_text=? AND status='active'").get(country,text))return fail(res,409,'Такой номер уже существует или уже лежит в магазине');
- db.prepare('INSERT INTO shop_items(plate_text,country,region,value,rarity,price_usd,image) VALUES(?,?,?,?,?,?,?)').run(text,country,region,value,shopRarity(value),price,image);
+ if(!image)return fail(res,400,'Загрузи картинку для рамки');
+ if(image.length>150000||!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(image))return fail(res,400,'Картинка некорректная или слишком большая');
+ db.prepare('INSERT INTO shop_items(plate_text,country,region,value,rarity,price_usd,image) VALUES(?,?,?,?,?,?,?)').run(title,'frame','',value,shopRarity(value),price,image);
  res.json({ok:true});
 });
 app.post('/api/admin/shop/:id/delete',auth,adminOnly,(req,res)=>{
@@ -410,11 +413,11 @@ app.post('/api/shop/:id/buy',auth,(req,res)=>{
  try{const out=db.transaction(()=>{
   const it=db.prepare("SELECT * FROM shop_items WHERE id=? AND status='active'").get(Number(req.params.id));
   if(!it)throw Error('Товар уже продан или удалён');
-  const pid=crypto.randomUUID();
-  try{db.prepare('INSERT INTO plates(id,owner_id,country,plate_text,region,letters,digits,plate_type,rarity,value,details_json) VALUES(?,?,?,?,?,?,?,?,?,?,?)').run(pid,req.user.id,it.country,it.plate_text,it.region,'','','civ',it.rarity,it.value,'[]')}
+  const pid=crypto.randomUUID(),frame=it.country==='frame',country=frame?'ru':it.country,ptext=frame?'РАМКА #'+it.id:it.plate_text;
+  try{db.prepare('INSERT INTO plates(id,owner_id,country,plate_text,region,letters,digits,plate_type,rarity,value,details_json,image) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)').run(pid,req.user.id,country,ptext,it.region,'','','civ',it.rarity,it.value,'[]',it.image||'')}
   catch(e){if(String(e).includes('UNIQUE'))throw Error('Такой номер уже существует');throw e}
   db.prepare("UPDATE shop_items SET status='sold',buyer_id=? WHERE id=?").run(req.user.id,it.id);
-  return {text:it.plate_text,price:it.price_usd,plate:{id:pid,country:it.country,region:it.region,value:it.value,rarity:it.rarity,image:it.image}};
+  return {text:it.plate_text,price:it.price_usd,frame,plate:{id:pid,country,region:it.region,value:it.value,rarity:it.rarity,image:it.image||''}};
  })();res.json({ok:true,...out})}catch(e){return fail(res,400,e.message||'Покупка не удалась')}
 });
 app.get('/api/health',(req,res)=>res.json({ok:true,service:'nomera-online'}));

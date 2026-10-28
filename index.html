@@ -46,6 +46,30 @@ footer{display:flex;gap:12px;justify-content:center;padding:6px 0 10px}footer .p
 
 small{color:var(--mt);font-weight:600}
 .pimg{position:absolute;right:3%;top:6%;height:44%;aspect-ratio:1;object-fit:cover;border-radius:6px;border:1px solid #fff9;z-index:2;pointer-events:none}
+.plate.frm{display:flex;align-items:center;justify-content:center;grid-template-columns:none;aspect-ratio:2.6/1;padding:5%}
+.plate.frm::before{display:none}
+.plate.frm img{height:100%;width:auto;max-width:100%;object-fit:contain;border-radius:8px}
+#epicfx{position:fixed;inset:0;z-index:26;pointer-events:none;overflow:hidden}
+#epicfx.out{opacity:0;transition:opacity .45s}
+.ef-flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,#fff 0,var(--c) 30%,transparent 72%);animation:eff .9s ease-out forwards}
+@keyframes eff{0%{opacity:.95}100%{opacity:0}}
+.ef-rays{position:absolute;left:50%;top:45%;width:260vmax;height:260vmax;margin:-130vmax 0 0 -130vmax;background:repeating-conic-gradient(from 0deg,var(--c) 0 7deg,transparent 7deg 20deg);-webkit-mask-image:radial-gradient(circle,#000 0,transparent 52%);mask-image:radial-gradient(circle,#000 0,transparent 52%);opacity:0;animation:efr 4s linear forwards,efri .5s ease-out .05s forwards}
+.leg .ef-rays{animation-duration:3s,.5s}
+@keyframes efr{to{transform:rotate(200deg)}}
+@keyframes efri{to{opacity:.5}}
+.ef-ring{position:absolute;left:50%;top:45%;width:24px;height:24px;margin:-12px 0 0 -12px;border:2px solid #fff;border-radius:50%;box-shadow:0 0 24px var(--c),inset 0 0 24px var(--c);animation:efring 1.1s ease-out forwards}
+.ef-ring.r2{animation-delay:.2s;opacity:0}.ef-ring.r3{animation-delay:.4s;opacity:0}
+@keyframes efring{0%{transform:scale(1);opacity:1}100%{transform:scale(60);opacity:0}}
+.ef-cv{position:absolute;inset:0;width:100%;height:100%}
+.ef-txt{position:absolute;left:0;right:0;top:45%;transform:translateY(-50%);text-align:center;padding:0 12px}
+.ef-t{font-size:min(23vw,120px);font-weight:900;letter-spacing:2px;color:#fff;text-shadow:0 0 18px var(--c),0 0 46px var(--c),0 6px 0 #0006;animation:eft .85s cubic-bezier(.2,1.7,.3,1) both,eftp 1s ease-in-out .9s infinite}
+.leg .ef-t{background:linear-gradient(180deg,#fff7c2,#ffd24a 48%,#ff8a00);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 0 16px var(--c)) drop-shadow(0 5px 0 #0007)}
+@keyframes eft{0%{transform:scale(5) rotate(-10deg);opacity:0}60%{opacity:1}100%{transform:scale(1) rotate(0)}}
+@keyframes eftp{50%{transform:scale(1.07)}}
+.ef-s{margin-top:12px;font-size:clamp(14px,4.2vw,20px);font-weight:800;color:#fff;text-shadow:0 2px 10px #000;animation:efs .5s .4s both}
+@keyframes efs{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+#app.shake{animation:shk .6s}
+@keyframes shk{0%,100%{transform:none}10%{transform:translate(-9px,6px) rotate(-.7deg)}25%{transform:translate(8px,-7px) rotate(.6deg)}40%{transform:translate(-7px,-5px)}55%{transform:translate(6px,6px) rotate(-.4deg)}70%{transform:translate(-4px,3px)}85%{transform:translate(3px,-2px)}}
 .shimg{width:84px;height:84px;object-fit:cover;border-radius:14px;border:1px solid var(--bd)}
 .clkw{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;position:relative}
 .clkb{width:min(68vw,270px);aspect-ratio:1;border-radius:50%;border:0;font-size:min(30vw,120px);font-weight:900;color:#7a5200;background:radial-gradient(circle at 35% 30%,#fff3b0,#f7c83a 45%,#c98f10);box-shadow:inset 0 -10px 24px #0004,inset 0 8px 16px #fff6,0 14px 40px #f7c83a55;touch-action:manipulation;transition:transform .06s;position:relative;display:flex;align-items:center;justify-content:center}
@@ -226,16 +250,29 @@ async function auth(reg){if(authBusy)return;authBusy=true;const bt=document.quer
 async function auth0(reg){const l=$("al").value.trim().toLowerCase(),p=$("ap").value,er=m=>$("ae").textContent=m;
  {const sv=$("as").value.trim().replace(/\/+$/,"");if(sv){if(!/^https?:\/\//i.test(sv))return er("Адрес сервера должен начинаться с http:// или https://");try{localStorage.setItem("nomera_api_base",sv)}catch(e){}}}
  if(!/^[a-z0-9_а-яё]{3,16}$/.test(l)||p.length<4)return er("Логин 3–16 символов, пароль от 4");
- er("Подключаюсь к серверу… (первый раз до минуты)");try{const r=await apiReq(reg?"/api/register":"/api/login",{login:l,password:p});LS.set("nomera_token",r.token);LS.set("nomera_cur",l);U=l;loadU(l);er("");$("ap").value="";$("au").classList.remove("on");setAuto();intro();go("gen");return}
- catch(e){
-  // Offline mode: lets the game work when the HTML is opened without the server.
-  if(!/Failed to fetch|NetworkError|fetch|Load failed|Сетевой|aborted|abort|Сервер недоступен|Сервер игры не настроен|Ошибка ответа сервера|Unexpected token|JSON/i.test(String(e.message)))return er(e.message||"Ошибка входа");
+ er("Подключаюсь к серверу… (первый раз до минуты)");
+ const finish=(offMsg)=>{U=l;LS.set("nomera_cur",l);loadU(l);$("ap").value="";setAuto();
+  if(offMsg){er(offMsg);setTimeout(()=>{$("au").classList.remove("on");er("");intro();go("gen")},900)}else{er("");$("au").classList.remove("on");intro();go("gen")}};
+ try{const r=await apiReq(reg?"/api/register":"/api/login",{login:l,password:p});
+  LS.set("nomera_token",r.token);
+  // запоминаем пароль на этом устройстве, чтобы можно было зайти, если сервер уснул
+  try{const ac=rd("nomera_local_accounts");ac[l]=await hs("local:",p);LS.set("nomera_local_accounts",JSON.stringify(ac))}catch(x){}
+  return finish()}
+ catch(e){const m=String(e.message||"");
+  const noServer=/Сервер игры не настроен/i.test(m);
+  const netErr=/Failed to fetch|NetworkError|Load failed|Сетевой|aborted|abort|Сервер недоступен|Ошибка ответа сервера|Unexpected token|JSON/i.test(m);
+  if(!noServer&&!netErr)return er(m||"Ошибка входа");
   const accounts=rd("nomera_local_accounts"),hash=await hs("local:",p);
-  if(reg){if(accounts[l])return er("Такой локальный логин уже существует");accounts[l]=hash;LS.set("nomera_local_accounts",JSON.stringify(accounts))}
-  else if(!accounts[l])return er("Локальный аккаунт не найден. Нажми «Регистрация».");
-  else if(accounts[l]!==hash)return er("Неверный пароль");
-  U=l;LS.set("nomera_cur",l);LS.set("nomera_token","");loadU(l);er("Офлайн-режим: онлайн-функции отключены");$("ap").value="";setTimeout(()=>{$("au").classList.remove("on");intro();go("gen")},900);setAuto();return
- }}
+  if(noServer){ // игра открыта без сервера: чисто локальные аккаунты
+   if(reg){if(accounts[l])return er("Такой локальный логин уже существует");accounts[l]=hash;LS.set("nomera_local_accounts",JSON.stringify(accounts))}
+   else if(!accounts[l])return er("Локальный аккаунт не найден. Нажми «Регистрация».");
+   else if(accounts[l]!==hash)return er("Неверный пароль");
+   LS.set("nomera_token","");return finish("Офлайн-режим: онлайн-функции отключены")}
+  // сервер настроен, но не отвечает: НЕ создаём локальных двойников серверных аккаунтов
+  if(reg)return er("Сервер сейчас недоступен. Регистрация только онлайн — подожди минуту (он просыпается) и повтори.");
+  if(!accounts[l])return er("Сервер недоступен, а этот аккаунт ещё не входил на этом устройстве. Повтори через минуту.");
+  if(accounts[l]!==hash)return er("Неверный пароль");
+  LS.set("nomera_token","");return finish("Сервер недоступен — вход офлайн, онлайн-функции отключены")}}
 
 const nm=(c,cn=S.cn)=>cn==="ua"?(UAR.find(x=>x[0]===c)||[0,c])[1]:cn==="ae"?(EM[c]||{n:c}).n:(NM[c]||NM[c.slice(-2)]||"Регион "+c);
 const hh=c=>{let h=7;for(const x of c)h=(h*31+x.charCodeAt(0))%97;return h/97};
@@ -277,7 +314,8 @@ const plate0=(p,sm)=>{const c=p.cn||"ru",z=sm?" sm":"";
  }
  const r=p.reg||"";return `<div class="plate ${p.ty||"civ"}${z}"><div class="pn">${txt(p)}</div><div class="pz"><b${r.length>2?' class="s3"':""}>${r}</b><span><i>RUS</i><u></u></span></div></div>`};
 const IMGRE=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/;
-const plate=(p,sm)=>{const h=plate0(p,sm);if(!p||!p.img||!IMGRE.test(p.img))return h;const i=h.lastIndexOf("</div>");return h.slice(0,i)+`<img class="pimg" src="${p.img}" alt="">`+h.slice(i)};
+const frameHtml=(img,sm)=>`<div class="plate frm${sm?" sm":""}"><img src="${img}" alt=""></div>`;
+const plate=(p,sm)=>{if(p&&p.fr&&p.img&&IMGRE.test(p.img))return frameHtml(p.img,sm);const h=plate0(p,sm);if(!p||!p.img||!IMGRE.test(p.img))return h;const i=h.lastIndexOf("</div>");return h.slice(0,i)+`<img class="pimg" src="${p.img}" alt="">`+h.slice(i)};
 function intro(){$("stage").classList.add("fresh");$("app").style.setProperty("--g","#8b8fa3");$("rn").textContent="Редкость";$("rn").style.color=$("rv").style.color="";$("rv").textContent="";$("bar").innerHTML="";$("tags").innerHTML="";$("pb").innerHTML='<div class="hint"><span>👆</span>Коснитесь экрана</div>'}
 const dash=r=>[0,1,2,3,4].map(i=>`<i${i<=r?` style="background:${RL[r][1]}"`:""}></i>`).join("");
 function toast(m){const t=$("ts");t.textContent=m;t.classList.add("on");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("on"),1600)}
@@ -370,10 +408,30 @@ function mkV(p){
 function count(e,v){const t0=performance.now(),D=SP[S.au]>2||fastMode?0:450;e._t=t0;if(!D){e.textContent=rub(v);return}
  (function f(t){if(e._t!==t0)return;const k=Math.min(1,(t-t0)/D);e.textContent=rub(v*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(f)})(t0)}
 function burst(c){const b=$("gen");for(let i=0;i<18;i++){const s=document.createElement("s"),a=Math.random()*6.28,d=90+rnd(150);s.style.cssText=`--x:${Math.cos(a)*d}px;--y:${Math.sin(a)*d}px;background:${c}`;b.appendChild(s);setTimeout(()=>s.remove(),900)}}
+let epicRaf=0,epicR=0,epicUntil=0,actx;
+function epicSnd(leg){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume();const t=actx.currentTime,len=leg?1.7:1.1,g=actx.createGain();g.connect(actx.destination);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.22,t+.06);g.gain.exponentialRampToValueAtTime(.0001,t+len);
+ (leg?[261.6,329.6,392,523.3,659.3,784]:[293.7,370,440,587.3]).forEach((f,i)=>{const o=actx.createOscillator();o.type=i%2?"triangle":"sawtooth";o.frequency.setValueAtTime(f/2,t);o.frequency.exponentialRampToValueAtTime(f,t+.14+i*.05);o.connect(g);o.start(t);o.stop(t+len)})}catch(e){}}
+function epicFx(p){const leg=p.r>=4,now=performance.now();
+ if(now<epicUntil&&p.r<=epicR&&S.au>0)return; // авто-режим: не заспамить одинаковыми эффектами
+ epicR=p.r;const dur=leg?3400:2400;epicUntil=now+dur;
+ const c=RL[p.r][1];let o=document.getElementById("epicfx");if(o)o.remove();cancelAnimationFrame(epicRaf);
+ o=document.createElement("div");o.id="epicfx";o.className=leg?"leg":"epc";o.style.setProperty("--c",c);
+ o.innerHTML='<div class="ef-flash"></div><div class="ef-rays"></div><div class="ef-ring"></div><div class="ef-ring r2"></div><div class="ef-ring r3"></div><canvas class="ef-cv"></canvas><div class="ef-txt"><div class="ef-t">'+(leg?"ЛЕГЕНДА!":"ЭПИК!")+'</div><div class="ef-s"></div></div>';
+ o.querySelector(".ef-s").textContent="Выбит номер "+txt(p)+" · "+rub(p.v);document.body.appendChild(o);
+ const app=$("app");app.classList.remove("shake");void app.offsetWidth;app.classList.add("shake");setTimeout(()=>app.classList.remove("shake"),leg?900:600);
+ if(navigator.vibrate)navigator.vibrate(leg?[80,40,80,40,200]:[60,30,120]);epicSnd(leg);
+ const cv=o.querySelector(".ef-cv"),dpr=Math.min(2,window.devicePixelRatio||1),W=cv.width=innerWidth*dpr,H=cv.height=innerHeight*dpr,cx=cv.getContext("2d");
+ const cols=[c,"#fff","#ffd166",leg?"#ff7a18":"#ec4899","#7dd3fc"],P=[],n=leg?320:170;
+ for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=(leg?9:7)*dpr*(.35+Math.random()*1.1);P.push({x:W/2,y:H*.45,vx:Math.cos(a)*v,vy:Math.sin(a)*v-2*dpr,s:(2+Math.random()*5)*dpr,c:cols[i%cols.length],r:Math.random()*6,vr:(Math.random()-.5)*.4,rect:Math.random()<.55})}
+ const t0=now;(function f(t){const k=t-t0;cx.clearRect(0,0,W,H);
+  for(const q of P){q.x+=q.vx;q.y+=q.vy;q.vy+=.16*dpr;q.vx*=.992;q.r+=q.vr;const al=Math.max(0,1-k/dur);cx.globalAlpha=al;cx.fillStyle=q.c;
+   if(q.rect){cx.save();cx.translate(q.x,q.y);cx.rotate(q.r);cx.fillRect(-q.s,-q.s/2,q.s*2,q.s);cx.restore()}else{cx.beginPath();cx.arc(q.x,q.y,q.s/1.6,0,6.3);cx.fill()}}
+  if(k>dur-450)o.classList.add("out");
+  if(k<dur)epicRaf=requestAnimationFrame(f);else o.remove()})(now)}
 function show(p,note){const stage=$("stage"),now=performance.now();fastMode=now-lastRoll<450;lastRoll=now;stage.classList.toggle("fast",fastMode);stage.querySelectorAll(".rarity-flash").forEach(x=>x.remove());stage.classList.remove("fresh","rarity-epic","rarity-legendary");void stage.offsetWidth;if(p.r===3)stage.classList.add("rarity-epic");if(p.r>=4)stage.classList.add("rarity-legendary");const[n,c]=RL[p.r];$("app").style.setProperty("--g",c);$("rn").textContent=n;$("rn").style.color=$("rv").style.color=c;
  $("bar").innerHTML=dash(p.r);$("pb").innerHTML='<div class="pop">'+plate(p)+"</div>";
  if(p.r>2)$("pb").firstChild.firstChild.classList.add("shine");
- $("tags").innerHTML=p.t.concat(note).map(x=>`<div>${x}</div>`).join("");count($("rv"),p.v);if(p.r>2&&SP[S.au]<5)burst(c);if(p.r>=3){const fx=document.createElement("div");fx.className="rarity-flash";fx.textContent=p.r>=4?"✦ ЛЕГЕНДАРНЫЙ НОМЕР ✦":"✦ ЭПИЧЕСКИЙ НОМЕР ✦";fx.style.setProperty("--rarity-color",c);$("stage").appendChild(fx);setTimeout(()=>fx.remove(),2300);if(navigator.vibrate)navigator.vibrate(p.r>=4?[60,40,100]:45)}}
+ $("tags").innerHTML=p.t.concat(note).map(x=>`<div>${x}</div>`).join("");count($("rv"),p.v);if(p.r>2&&SP[S.au]<5)burst(c);if(p.r>=3)epicFx(p)}
 let srvDownUntil=0,authBusy=false,lastRoll=0,fastMode=false,claimQ=[],claimBusy=false,claimedC=null,claimedU=null,claimedT,saveT;
 function claimedMap(){const u=U||"guest";if(claimedU!==u){claimedC=rd("nomera_claimed_"+u);claimedU=u}return claimedC}
 function saveClaimedSoon(){clearTimeout(claimedT);claimedT=setTimeout(()=>{if(claimedC)LS.set("nomera_claimed_"+(claimedU||"guest"),JSON.stringify(claimedC))},800)}
@@ -630,26 +688,25 @@ function draw(){const s=cur,hd=`<header class="top"><button class="sq" data-go="
  if(s==="col"||s==="safe"){$("q").value=q;lstDraw()}if(s==="auction")apiAuctionList();if(s==="shop")apiShop();if(s==="adm")admInit();if(s==="tasks")apiTasks();hud()}
 let shopItems=[],shopImg="";
 const shopS=()=>`<div id="shop-admin"></div><div id="shop-list"><p class="mut">Загрузка…</p></div>`;
-const shopForm=()=>`<div class="card" style="display:block"><b>Добавить товар</b><p class="mut">Номер, картинка и цена в $. Когда купят — номер выдаётся покупателю.</p>
-<input id="sh-text" placeholder="Номер, например А777АА" style="margin-bottom:8px"><select id="sh-cn" style="margin-bottom:8px">${Object.keys(CN).map(k=>`<option value="${k}">${CN[k].n}</option>`).join("")}</select>
-<input id="sh-reg" placeholder="Регион (необязательно)" style="margin-bottom:8px"><input id="sh-val" type="number" inputmode="numeric" placeholder="Стоимость номера, ₽ (определяет редкость)" style="margin-bottom:8px">
+const shopForm=()=>`<div class="card" style="display:block"><b>Добавить товар</b><p class="mut">Рамка номера с твоей картинкой или иконкой. Когда её купят — она выдаётся покупателю.</p>
+<input id="sh-title" placeholder="Название (необязательно)" style="margin-bottom:8px"><input id="sh-val" type="number" inputmode="numeric" placeholder="Стоимость рамки, ₽ (определяет редкость)" style="margin-bottom:8px">
 <input id="sh-price" type="number" inputmode="decimal" step="0.001" placeholder="Цена, $" style="margin-bottom:8px">
 <input id="sh-img" type="file" accept="image/*" style="margin-bottom:8px"><img id="sh-pv" class="shimg" style="display:none;margin-bottom:8px" alt="">
 <button class="pill" style="width:100%" data-a="shopAdd">Добавить в магазин</button></div>`;
 async function apiShop(){const el=$("shop-list");try{const d=await apiReq("/api/shop");shopItems=d.items;
  const ad=$("shop-admin");if(ad&&d.admin&&!ad.innerHTML)ad.innerHTML=shopForm();
- if(el)el.innerHTML=d.items.map(it=>{const pv={cn:it.country,tx:it.text,reg:it.region||"",L:"",d:"",ty:"civ"};
-  return `<div class="card" style="display:block"><div style="display:flex;gap:12px;align-items:center">${it.image&&IMGRE.test(it.image)?`<img class="shimg" src="${it.image}" alt="">`:""}<div style="flex:1;min-width:0">${plate(pv,1)}</div></div>
-  <p class="mut">Стоимость: ${rub(it.value)}</p><div class="row" style="align-items:center;margin:8px 0 0"><b style="flex:1;font-size:20px">${usd(it.price)} $</b><button class="pill" data-a="shopBuy" data-sid="${it.id}">Купить</button>${d.admin?`<button class="pill s" data-a="shopDel" data-sid="${it.id}">Удалить</button>`:""}</div></div>`}).join("")||'<p class="mut">В магазине пока пусто.</p>'}
+ if(el)el.innerHTML=d.items.map(it=>`<div class="card" style="display:block">${it.image&&IMGRE.test(it.image)?frameHtml(it.image):""}
+  <b style="display:block;margin-top:8px">${esc(it.text)}</b><p class="mut">Стоимость: ${rub(it.value)}</p><div class="row" style="align-items:center;margin:8px 0 0"><b style="flex:1;font-size:20px">${usd(it.price)} $</b><button class="pill" data-a="shopBuy" data-sid="${it.id}">Купить</button>${d.admin?`<button class="pill s" data-a="shopDel" data-sid="${it.id}">Удалить</button>`:""}</div></div>`).join("")||'<p class="mut">В магазине пока пусто.</p>'}
  catch(e){if(el)el.innerHTML=`<p class="mut">${esc(e.message)}</p>`}}
-async function shopAdd(){try{const text=$("sh-text").value.trim(),price=Number($("sh-price").value);if(!text)return toast("Укажи номер");if(!(price>0))return toast("Укажи цену в $");
- await apiReq("/api/admin/shop",{text,country:$("sh-cn").value,region:$("sh-reg").value,value:Number($("sh-val").value)||0,price,image:shopImg});
- toast("Товар добавлен");["sh-text","sh-reg","sh-val","sh-price","sh-img"].forEach(i=>$(i).value="");shopImg="";$("sh-pv").style.display="none";apiShop()}catch(e){toast(e.message)}}
+async function shopAdd(){try{const price=Number($("sh-price").value);if(!shopImg)return toast("Загрузи картинку");if(!(price>0))return toast("Укажи цену в $");
+ await apiReq("/api/admin/shop",{title:$("sh-title").value,value:Number($("sh-val").value)||0,price,image:shopImg});
+ toast("Товар добавлен");["sh-title","sh-val","sh-price","sh-img"].forEach(i=>$(i).value="");shopImg="";$("sh-pv").style.display="none";apiShop()}catch(e){toast(e.message)}}
 async function shopDel(id){try{await apiReq("/api/admin/shop/"+id+"/delete",{});toast("Товар удалён");apiShop()}catch(e){toast(e.message)}}
 async function shopBuy(id){const it=shopItems.find(x=>String(x.id)===String(id));if(!it)return;if(S.usd+1e-9<it.price)return toast("Не хватает $");
  try{const d=await apiReq("/api/shop/"+id+"/buy",{});S.usd=Math.max(0,Math.round((S.usd-it.price)*1000)/1000);
-  const q=mkV({cn:d.plate.country,tx:d.text,reg:d.plate.region||"",L:"",d:"",ty:"civ",sid:d.plate.id,id:"shop_"+d.plate.id,t0:Date.now(),img:d.plate.image||""});
-  if(d.plate.value>0)q.v=d.plate.value;q.r=tier(q);if(!S.inv.some(p=>p.sid===d.plate.id))S.inv.unshift(q);
+  const fr=!!(d.frame&&d.plate.image);
+  const q=mkV({cn:d.plate.country,tx:fr?d.text:d.text,reg:d.plate.region||"",L:"",d:"",ty:"civ",sid:d.plate.id,id:"shop_"+d.plate.id,t0:Date.now(),img:d.plate.image||"",fr:fr?1:0});
+  if(d.plate.value>0)q.v=d.plate.value;q.r=tier(q);if(fr)q.t=["Рамка"];if(!S.inv.some(p=>p.sid===d.plate.id))S.inv.unshift(q);
   save();hud();toast("Куплено: "+d.text);apiShop()}catch(e){toast(e.message);apiShop()}}
 function shopPickImg(file){return new Promise((ok,no)=>{const r=new FileReader();r.onerror=no;r.onload=()=>{const im=new Image();im.onerror=no;im.onload=()=>{const k=Math.min(1,240/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.max(1,Math.round(im.width*k));c.height=Math.max(1,Math.round(im.height*k));c.getContext("2d").drawImage(im,0,0,c.width,c.height);ok(c.toDataURL("image/jpeg",.72))};im.src=r.result};r.readAsDataURL(file)})}
 document.addEventListener("change",async e=>{if(e.target.id!=="sh-img")return;const f=e.target.files&&e.target.files[0];if(!f)return;try{shopImg=await shopPickImg(f);$("sh-pv").src=shopImg;$("sh-pv").style.display="block"}catch(x){toast("Не удалось прочитать картинку")}});
@@ -749,7 +806,7 @@ async function apiTransfer(){try{const id=$("tr-id").value.trim();await apiReq("
 async function apiCreateAuction(){try{const plate=$("auc-plate").value.trim(),price=Number($("auc-price").value);if(!plate||!Number.isSafeInteger(price)||price<1)return toast("Укажи номер и целую цену больше нуля");await apiReq("/api/auctions",{plate,price});toast("Номер выставлен на аукцион");$("auc-plate").value="";$("auc-price").value="";apiAuctionList()}catch(e){toast(e.message)}}
 async function apiAuctionList(){try{const d=await apiReq("/api/auctions"),el=$("auction-list"),mine=$("auction-mine");if(el)el.innerHTML=d.auctions.filter(x=>!x.mine).map(x=>`<div class="card"><div><b>${x.text}</b><p class="mut">${x.seller} · редкость ${x.rarity+1}/5</p><b>${rub(x.price)}</b></div><button class="pill" data-buy-auction="${x.id}">Купить</button></div>`).join("")||'<p class="mut">Сейчас нет чужих лотов.</p>';if(mine)mine.innerHTML=d.auctions.filter(x=>x.mine).map(x=>`<div class="card"><div><b>${x.text}</b><p class="mut">Твоя цена: ${rub(x.price)}</p></div><button class="pill" data-a="auctionCancel" data-aid="${x.id}">Снять</button></div>`).join("")||'<p class="mut">Ты пока ничего не выставил.</p>'}catch(e){const el=$("auction-list");if(el)el.innerHTML=`<p class="mut">${e.message}</p>`}}
 async function apiCancelAuction(id){try{await apiReq("/api/auctions/"+id+"/cancel",{});toast("Лот снят с продажи");apiAuctionList()}catch(e){toast(e.message)}}
-async function apiBuyAuction(id){try{const d=await apiReq("/api/auctions/"+id+"/buy",{});toast("Куплено: "+d.text);if(d.plate&&!S.inv.some(p=>p.sid===d.plate.id)){S.inv.unshift(mkV({cn:d.plate.country||"ru",L:d.plate.letters||"",d:d.plate.digits||"",reg:d.plate.region||"",ty:d.plate.type||"civ",r:d.plate.rarity||0,v:d.plate.value||d.price,sid:d.plate.id,id:"auc_"+d.plate.id,t0:Date.now()}));}apiAuctionList();S.m=Math.max(0,S.m-(d.price||0));save();hud();}catch(e){toast(e.message)}}
+async function apiBuyAuction(id){try{const d=await apiReq("/api/auctions/"+id+"/buy",{});toast("Куплено: "+d.text);if(d.plate&&!S.inv.some(p=>p.sid===d.plate.id)){{const fr=!!(d.plate.image&&/^РАМКА #/.test(d.text)),o={cn:d.plate.country||"ru",L:d.plate.letters||"",d:d.plate.digits||"",reg:d.plate.region||"",ty:d.plate.type||"civ",r:d.plate.rarity||0,v:d.plate.value||d.price,sid:d.plate.id,id:"auc_"+d.plate.id,t0:Date.now()};if(fr){o.fr=1;o.tx="Рамка";o.img=d.plate.image}const q=mkV(o);if(d.plate.value>0)q.v=d.plate.value;q.r=tier(q);if(fr)q.t=["Рамка"];S.inv.unshift(q)}}apiAuctionList();S.m=Math.max(0,S.m-(d.price||0));save();hud();}catch(e){toast(e.message)}}
 async function apiTrade(){try{await apiReq("/api/trades",{to:$("ex-to").value,myPlateId:$("ex-mine").value,theirPlateId:$("ex-theirs").value,cash:Number($("ex-cash").value||0),usd:Number($("ex-usd").value||0)});toast("Предложение отправлено")}catch(e){toast(e.message)}}
 async function apiLookupPlates(){try{const login=encodeURIComponent($("ex-to").value.trim());const d=await apiReq("/api/players/"+login+"/plates");const el=$("other-plates");if(el)el.innerHTML=d.plates.map(p=>`<button class="card" data-copy-plate="${p.text}"><div><b>${p.text}</b><p class="mut">Номер: ${p.text}</p></div><span class="mut">Нажми, чтобы выбрать</span></button>`).join("")||'<p class="mut">У игрока пока нет номеров.</p>'}catch(e){toast(e.message)}}
 async function apiTradeInbox(){try{const d=await apiReq("/api/trades");const el=$("trade-inbox");if(el)el.innerHTML=d.offers.map(o=>`<div class="card"><div><b>${o.from_login}: ${o.from_plate} ⇄ ${o.to_plate}</b><p class="mut">Доплата: ${o.cash} ₽ · ${o.dollars} $</p></div><button class="pill" data-accept-trade="${o.id}">Принять</button></div>`).join("")||'<p class="mut">Нет входящих предложений.</p>'}catch(e){toast(e.message)}}
