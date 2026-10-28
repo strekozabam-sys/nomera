@@ -213,13 +213,14 @@ const rd=k=>{try{return JSON.parse(LS.get(k)||"{}")}catch(e){return{}}};
 function loadU(u){for(const k in S)delete S[k];const d=rd("nomera_d_"+u);if(d.v!==2){d.as=0;d.v=2}Object.assign(S,DEF(),d);if(!cOpen(S.cn,u)){S.cn="ru";S.reg=""}S.inv.forEach(p=>{if(p.q!==2)mkV(p);p.r=tier(p)})}
 const save=()=>{if(U)LS.set("nomera_d_"+U,JSON.stringify(S))};
 async function hs(p,s){const t=s+p;try{return[...new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t)))].map(b=>b.toString(16).padStart(2,"0")).join("")}catch(e){let h=5381;for(const c of t)h=(h*33^c.charCodeAt(0))>>>0;return""+h}}
-async function auth(reg){const l=$("al").value.trim().toLowerCase(),p=$("ap").value,er=m=>$("ae").textContent=m;
+async function auth(reg){if(authBusy)return;authBusy=true;const bt=document.querySelectorAll("#au .foot button");bt.forEach(b=>{b.disabled=true;b.style.opacity=".5"});try{return await auth0(reg)}finally{authBusy=false;bt.forEach(b=>{b.disabled=false;b.style.opacity=""})}}
+async function auth0(reg){const l=$("al").value.trim().toLowerCase(),p=$("ap").value,er=m=>$("ae").textContent=m;
  {const sv=$("as").value.trim().replace(/\/+$/,"");if(sv){if(!/^https?:\/\//i.test(sv))return er("Адрес сервера должен начинаться с http:// или https://");try{localStorage.setItem("nomera_api_base",sv)}catch(e){}}}
  if(!/^[a-z0-9_а-яё]{3,16}$/.test(l)||p.length<4)return er("Логин 3–16 символов, пароль от 4");
- try{const r=await apiReq(reg?"/api/register":"/api/login",{login:l,password:p});LS.set("nomera_token",r.token);LS.set("nomera_cur",l);U=l;loadU(l);er("");$("ap").value="";$("au").classList.remove("on");setAuto();intro();go("gen");return}
+ er("Подключаюсь к серверу… (первый раз до минуты)");try{const r=await apiReq(reg?"/api/register":"/api/login",{login:l,password:p});LS.set("nomera_token",r.token);LS.set("nomera_cur",l);U=l;loadU(l);er("");$("ap").value="";$("au").classList.remove("on");setAuto();intro();go("gen");return}
  catch(e){
   // Offline mode: lets the game work when the HTML is opened without the server.
-  if(!/Failed to fetch|NetworkError|fetch|Load failed|Сетевой|Сервер недоступен|Сервер игры не настроен|Ошибка ответа сервера|Unexpected token|JSON/i.test(String(e.message)))return er(e.message||"Ошибка входа");
+  if(!/Failed to fetch|NetworkError|fetch|Load failed|Сетевой|aborted|abort|Сервер недоступен|Сервер игры не настроен|Ошибка ответа сервера|Unexpected token|JSON/i.test(String(e.message)))return er(e.message||"Ошибка входа");
   const accounts=rd("nomera_local_accounts"),hash=await hs("local:",p);
   if(reg){if(accounts[l])return er("Такой локальный логин уже существует");accounts[l]=hash;LS.set("nomera_local_accounts",JSON.stringify(accounts))}
   else if(!accounts[l])return er("Локальный аккаунт не найден. Нажми «Регистрация».");
@@ -362,14 +363,14 @@ function show(p,note){const stage=$("stage");stage.classList.remove("fresh","rar
  $("bar").innerHTML=dash(p.r);$("pb").innerHTML='<div class="pop">'+plate(p)+"</div>";
  if(p.r>2)$("pb").firstChild.firstChild.classList.add("shine");
  $("tags").innerHTML=p.t.concat(note).map(x=>`<div>${x}</div>`).join("");count($("rv"),p.v);if(p.r>2&&SP[S.au]<5)burst(c);if(p.r>=3){const fx=document.createElement("div");fx.className="rarity-flash";fx.textContent=p.r>=4?"✦ ЛЕГЕНДАРНЫЙ НОМЕР ✦":"✦ ЭПИЧЕСКИЙ НОМЕР ✦";fx.style.setProperty("--rarity-color",c);$("stage").appendChild(fx);setTimeout(()=>fx.remove(),2300);if(navigator.vibrate)navigator.vibrate(p.r>=4?[60,40,100]:45)}}
-let rolling=false;
-async function roll(){if(rolling)return;rolling=true;try{const result=await rollImpl();if(result&&result.r>=3)await new Promise(resolve=>setTimeout(resolve,result.r>=4?2800:2200));}finally{rolling=false}}
+let rolling=false,srvDownUntil=0,authBusy=false;
+async function roll(){if(rolling)return;rolling=true;try{if($("au").classList.contains("on"))return;await rollImpl();}finally{rolling=false}}
 async function rollImpl(){const N=S.luck+1;let b=null;
  if(N<=30){for(let i=0;i<N;i++){const p=mkV(gen());if(!b||p.v>b.v)b=p}}
  else{const ux=()=>1-Math.pow(1-Math.random(),1/N);for(let i=0;i<8;i++){const p=mkV(gen(ux));if(!b||p.v>b.v)b=p}}
- if(U&&LS.get("nomera_token")){try{const saved=await apiReq("/api/claim",{plate:{text:txt(b),country:b.cn||"ru",region:b.reg,letters:b.L,digits:b.d,type:b.ty,rarity:b.r,value:b.v,details:b.t},luck:S.luck});b.sid=saved.id}catch(e){if(/уже существует/i.test(e.message))return rollImpl();
+ if(U&&LS.get("nomera_token")&&Date.now()>srvDownUntil){try{const saved=await apiReq("/api/claim",{plate:{text:txt(b),country:b.cn||"ru",region:b.reg,letters:b.L,digits:b.d,type:b.ty,rarity:b.r,value:b.v,details:b.t},luck:S.luck},{noWake:true,timeout:5000});b.sid=saved.id}catch(e){if(/уже существует/i.test(e.message))return rollImpl();
    // If the server is offline, continue locally and prevent duplicates in this browser.
-   if(/Failed to fetch|NetworkError|fetch|Load failed|Сетевой/i.test(String(e.message))){toast("Сервер недоступен — продолжаю офлайн")}
+   if(/Failed to fetch|NetworkError|fetch|Load failed|Сетевой|aborted|abort/i.test(String(e.message))){srvDownUntil=Date.now()+60000;toast("Сервер недоступен — продолжаю офлайн")}
    else {toast("Не удалось сохранить онлайн-номер: "+e.message);return}
  }}
  const claimed=rd("nomera_claimed_"+(U||"guest"));const key=(b.cn||"ru")+":"+txt(b);
@@ -658,9 +659,9 @@ const DEFAULT_API="https://nomera-1tbh.onrender.com";/* впиши сюда ад
 function apiBase(){try{const saved=localStorage.getItem("nomera_api_base");if(saved)return saved.replace(/\/$/,"")}catch(e){}if(DEFAULT_API)return DEFAULT_API.replace(/\/$/,"");return location.protocol==="http:"||location.protocol==="https:"?location.origin:""}
 let wakeP=null;
 function wakeServer(base){if(wakeP)return wakeP;toast("Сервер просыпается, подожди до минуты…");wakeP=(async()=>{for(let i=0;i<14;i++){try{const r=await fetch(base+"/api/health",{cache:"no-store"});if(r.ok)return true}catch(e){}await new Promise(r=>setTimeout(r,5000))}return false})().finally(()=>{wakeP=null});return wakeP}
-async function apiReq(path,body){const token=LS.get("nomera_token")||"";const base=apiBase();if(!base)throw Error("Для онлайн-режима укажи адрес сервера: добавь ?api=https://адрес-твоего-сервера к ссылке приложения");
- const go1=()=>fetch(base+path,{method:body?"POST":"GET",headers:{"Content-Type":"application/json",...(token?{Authorization:"Bearer "+token}:{})},...(body?{body:JSON.stringify(body)}:{})});
- let r;try{r=await go1()}catch(e){if(!(await wakeServer(base)))throw Error("Сервер недоступен: проверь адрес сервера или повтори через минуту");r=await go1()}
+async function apiReq(path,body,opt){opt=opt||{};const token=LS.get("nomera_token")||"";const base=apiBase();if(!base)throw Error("Для онлайн-режима укажи адрес сервера: добавь ?api=https://адрес-твоего-сервера к ссылке приложения");
+ const go1=()=>{const ac=new AbortController(),tm0=setTimeout(()=>ac.abort(),opt.timeout||15000);return fetch(base+path,{method:body?"POST":"GET",signal:ac.signal,headers:{"Content-Type":"application/json",...(token?{Authorization:"Bearer "+token}:{})},...(body?{body:JSON.stringify(body)}:{})}).finally(()=>clearTimeout(tm0))};
+ let r;try{r=await go1()}catch(e){if(opt.noWake)throw Error("Сетевой сбой");if(!(await wakeServer(base)))throw Error("Сервер недоступен: проверь адрес сервера или повтори через минуту");r=await go1()}
  const d=await r.json().catch(()=>({error:"Сервер игры не настроен на сайте. Используется локальный режим."}));if(!r.ok){const er=Error(d.error||"Ошибка сервера");er.status=r.status;throw er}return d}
 const esc=x=>String(x).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const ago=ts=>{if(!ts)return"никогда";const m=Math.floor((Date.now()-ts)/60000);return m<1?"только что":m<60?m+" мин назад":m<1440?Math.floor(m/60)+" ч назад":Math.floor(m/1440)+" дн назад"};
