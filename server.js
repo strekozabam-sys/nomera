@@ -107,7 +107,7 @@ function trackTasks(userId,{rarity,country}){
  }
 }
 app.use((req,res,next)=>{res.setHeader('Access-Control-Allow-Origin','*');res.setHeader('Access-Control-Allow-Headers','Content-Type, Authorization');res.setHeader('Access-Control-Allow-Methods','GET, POST, OPTIONS');if(req.method==='OPTIONS')return res.sendStatus(204);next()});
-app.use(express.json({limit:'32kb'}));
+app.use(express.json({limit:'256kb'}));
 // Раздаём только страницу игры: раньше express.static(__dirname) отдавал наружу nomera.sqlite и server.js
 app.get(['/','/index.html'],(req,res)=>res.sendFile(path.join(__dirname,'index.html')));
 function fail(res, status, error) { return res.status(status).json({error}); }
@@ -367,6 +367,56 @@ app.post('/api/auctions/:id/buy',auth,(req,res)=>{
  })();res.json({ok:true,...result})}catch(e){return fail(res,400,e.message||'Покупка не удалась')}
 });
 
+db.exec(`
+CREATE TABLE IF NOT EXISTS shop_items (
+ id INTEGER PRIMARY KEY AUTOINCREMENT,
+ plate_text TEXT NOT NULL,
+ country TEXT NOT NULL,
+ region TEXT NOT NULL DEFAULT '',
+ value INTEGER NOT NULL DEFAULT 0,
+ rarity INTEGER NOT NULL DEFAULT 0,
+ price_usd REAL NOT NULL CHECK(price_usd > 0),
+ image TEXT NOT NULL DEFAULT '',
+ status TEXT NOT NULL DEFAULT 'active',
+ buyer_id INTEGER,
+ created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS shop_status_idx ON shop_items(status);
+`);
+const SHOP_COUNTRIES=['ru','ua','ae','am','ge','kz','az','uz','kg','tj','tr','us','ng','af','pt','ady'];
+const isAdminUser=u=>u.login.toLowerCase()===String(process.env.ADMIN_LOGIN||'admin').toLowerCase();
+const shopRarity=v=>[0,5e3,3e4,3e5,2.5e6].reduce((r,t,i)=>v>=t?i:r,0);
+app.get('/api/shop',auth,(req,res)=>{
+ const items=db.prepare("SELECT id,plate_text AS text,country,region,value,rarity,price_usd AS price,image FROM shop_items WHERE status='active' ORDER BY id DESC LIMIT 200").all();
+ res.json({items,admin:isAdminUser(req.user)});
+});
+app.post('/api/admin/shop',auth,adminOnly,(req,res)=>{
+ const b=req.body||{},text=String(b.text||'').trim().toUpperCase(),country=String(b.country||'ru'),region=String(b.region||'').trim().slice(0,8);
+ const price=Math.round(Number(b.price)*1000)/1000,value=Math.max(0,Math.min(2000000000,Math.round(Number(b.value)||0))),image=String(b.image||'');
+ if(!text||text.length>40)return fail(res,400,'Укажи номер (до 40 символов)');
+ if(!SHOP_COUNTRIES.includes(country))return fail(res,400,'Неизвестная страна');
+ if(!(price>0)||price>1e9)return fail(res,400,'Цена в $ должна быть больше нуля');
+ if(image&&(image.length>150000||!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(image)))return fail(res,400,'Картинка некорректная или слишком большая');
+ if(db.prepare('SELECT 1 FROM plates WHERE country=? AND plate_text=?').get(country,text)||db.prepare("SELECT 1 FROM shop_items WHERE country=? AND plate_text=? AND status='active'").get(country,text))return fail(res,409,'Такой номер уже существует или уже лежит в магазине');
+ db.prepare('INSERT INTO shop_items(plate_text,country,region,value,rarity,price_usd,image) VALUES(?,?,?,?,?,?,?)').run(text,country,region,value,shopRarity(value),price,image);
+ res.json({ok:true});
+});
+app.post('/api/admin/shop/:id/delete',auth,adminOnly,(req,res)=>{
+ const r=db.prepare("DELETE FROM shop_items WHERE id=? AND status='active'").run(Number(req.params.id));
+ if(!r.changes)return fail(res,404,'Товар не найден или уже продан');
+ res.json({ok:true});
+});
+app.post('/api/shop/:id/buy',auth,(req,res)=>{
+ try{const out=db.transaction(()=>{
+  const it=db.prepare("SELECT * FROM shop_items WHERE id=? AND status='active'").get(Number(req.params.id));
+  if(!it)throw Error('Товар уже продан или удалён');
+  const pid=crypto.randomUUID();
+  try{db.prepare('INSERT INTO plates(id,owner_id,country,plate_text,region,letters,digits,plate_type,rarity,value,details_json) VALUES(?,?,?,?,?,?,?,?,?,?,?)').run(pid,req.user.id,it.country,it.plate_text,it.region,'','','civ',it.rarity,it.value,'[]')}
+  catch(e){if(String(e).includes('UNIQUE'))throw Error('Такой номер уже существует');throw e}
+  db.prepare("UPDATE shop_items SET status='sold',buyer_id=? WHERE id=?").run(req.user.id,it.id);
+  return {text:it.plate_text,price:it.price_usd,plate:{id:pid,country:it.country,region:it.region,value:it.value,rarity:it.rarity,image:it.image}};
+ })();res.json({ok:true,...out})}catch(e){return fail(res,400,e.message||'Покупка не удалась')}
+});
 app.get('/api/health',(req,res)=>res.json({ok:true,service:'nomera-online'}));
 const port=Number(process.env.PORT||3000);
 app.listen(port,'0.0.0.0',()=>console.log(`Генератор номеров запущен: http://localhost:${port}`));
