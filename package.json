@@ -1,0 +1,10 @@
+{
+  "name": "nomera-online",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Онлайн-генератор автомобильных номеров с аккаунтами, SQLite и обменом",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=20" },
+  "dependencies": { "bcryptjs": "^2.4.3", "better-sqlite3": "^11.7.0", "express": "^4.21.2" }
+}
